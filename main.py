@@ -1,8 +1,37 @@
+import json
+
 import ollama
 
 from tools import create_text_file
 
-TOOLS = {
+model = "llama3.2:3b"
+
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "create_text_file",
+            "description": "Create a text file with the given filename and content.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "description": "The filename, for example help.txt",
+                    },
+                    "content": {
+                        "type": "string",
+                        "description": "The content that should be written into the file.",
+                    },
+                },
+                "required": ["filename", "content"],
+            },
+        },
+    }
+]
+
+
+available_tools = {
     "create_text_file": create_text_file,
 }
 
@@ -16,10 +45,10 @@ You are an agent.
 You have access to tools.
 
 When the user asks you to create a text file,
-use the create_text_file tool.
+you MUST use the create_text_file tool.
 
-Do not pretend that you created a file.
-Actually call the tool.
+Do not say that you created a file unless the tool
+was actually executed successfully.
 """,
     }
 ]
@@ -39,31 +68,49 @@ while True:
     )
 
     response = ollama.chat(
-        model="llama3.2:3b",
+        model=model,
         messages=messages,
-        tools=[
-            {
-                "type": "function",
-                "function": {
-                    "name": "create_text_file",
-                    "description": "Create a text file.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "filename": {
-                                "type": "string",
-                                "description": "Name of the file",
-                            },
-                            "content": {
-                                "type": "string",
-                                "description": "Content of the file",
-                            },
-                        },
-                        "required": ["filename", "content"],
-                    },
-                },
-            }
-        ],
+        tools=tools,
     )
 
-    print(response["message"]["content"])
+    message = response["message"]
+
+    messages.append(message)
+
+    if message.get("tool_calls"):
+        for tool_call in message["tool_calls"]:
+            function_name = tool_call["function"]["name"]
+            arguments = tool_call["function"]["arguments"]
+
+            print(f"\n[Agent wants to call: {function_name}]")
+            print(f"[Arguments: {arguments}]")
+
+            function = available_tools.get(function_name)
+
+            if function is None:
+                print(f"Unknown tool: {function_name}")
+                continue
+
+            result = function(**arguments)
+
+            print(f"[Tool result: {result}]")
+
+            messages.append(
+                {
+                    "role": "tool",
+                    "content": json.dumps(result),
+                }
+            )
+
+        response = ollama.chat(
+            model=model,
+            messages=messages,
+            tools=tools,
+        )
+
+        messages.append(response["message"])
+
+        print(response["message"]["content"])
+
+    else:
+        print(message["content"])
