@@ -1,23 +1,26 @@
-import json
+# Libs
+import json  # Json
+import ollama  # Ollama
 
-import ollama
+# Application
+from core.settings import settings  # Core: Settings
+from utils.write_file import write_file  # Utils: Write File
+from utils.read_file import read_file  # Utils: Read File
 
-from tools import create_text_file
-
-model = "llama3.2:3b"
+model = settings.MODEL
 
 tools = [
     {
         "type": "function",
         "function": {
-            "name": "create_text_file",
-            "description": "Create a text file with the given filename and content.",
+            "name": "write_file",
+            "description": "Create a file with the given filename and content.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "filename": {
                         "type": "string",
-                        "description": "The filename, for example help.txt",
+                        "description": "The filename, for example file.txt",
                     },
                     "content": {
                         "type": "string",
@@ -27,31 +30,30 @@ tools = [
                 "required": ["filename", "content"],
             },
         },
-    }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_file",
+            "description": "Read the content of an existing file.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "filename": {
+                        "type": "string",
+                        "description": "The filename to read, for example file.txt",
+                    },
+                },
+                "required": ["filename"],
+            },
+        },
+    },
 ]
-
 
 available_tools = {
-    "create_text_file": create_text_file,
+    "write_file": write_file,
+    "read_file": read_file,
 }
-
-
-messages = [
-    {
-        "role": "system",
-        "content": """
-You are an agent.
-
-You have access to tools.
-
-When the user asks you to create a text file,
-you MUST use the create_text_file tool.
-
-Do not say that you created a file unless the tool
-was actually executed successfully.
-""",
-    }
-]
 
 
 while True:
