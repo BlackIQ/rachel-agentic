@@ -1,118 +1,111 @@
 # Libs
-import json  # Json
-import ollama  # Ollama
+from ollama import chat, ChatResponse, Message  # Ollama
 
 # Application
 from core.settings import settings  # Core: Settings
-from utils.write_file import write_file  # Utils: Write File
-from utils.read_file import read_file  # Utils: Read File
 
 model = settings.MODEL
 
+messages: list[Message] = []
+
+
+def get_temperature(city: str) -> str:
+    """Get the current temperature for a city
+
+    Args:
+      city: The name of the city
+
+    Returns:
+      The current temperature for the city
+    """
+
+    temperatures = {
+        "New York": "22°C",
+        "London": "15°C",
+        "Tokyo": "18°C",
+    }
+
+    return temperatures.get(city, "Unknown")
+
+
+def get_conditions(city: str) -> str:
+    """Get the current weather conditions for a city
+
+    Args:
+      city: The name of the city
+
+    Returns:
+      The current weather conditions for the city
+    """
+
+    conditions = {
+        "New York": "Partly cloudy",
+        "London": "Rainy",
+        "Tokyo": "Sunny",
+    }
+
+    return conditions.get(city, "Unknown")
+
+
 tools = [
-    {
-        "type": "function",
-        "function": {
-            "name": "write_file",
-            "description": "Create a file with the given filename and content.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filename": {
-                        "type": "string",
-                        "description": "The filename, for example file.txt",
-                    },
-                    "content": {
-                        "type": "string",
-                        "description": "The content that should be written into the file.",
-                    },
-                },
-                "required": ["filename", "content"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "read_file",
-            "description": "Read the content of an existing file.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "filename": {
-                        "type": "string",
-                        "description": "The filename to read, for example file.txt",
-                    },
-                },
-                "required": ["filename"],
-            },
-        },
-    },
+    get_temperature,
+    get_conditions,
 ]
 
-available_tools = {
-    "write_file": write_file,
-    "read_file": read_file,
+available_functions = {
+    "get_temperature": get_temperature,
+    "get_conditions": get_conditions,
 }
+
+print(f"Rachel ({model}) is ready. Type 'exit' or 'quit' to stop.\n")
 
 
 while True:
-    user_input = input("\nWhat the fuck can I do for you? ")
+    user_input = input("User: ").strip()
 
     if user_input.lower() in {"exit", "quit"}:
         break
 
     messages.append(
-        {
-            "role": "user",
-            "content": user_input,
-        }
+        Message(
+            role="user",
+            content=user_input,
+        ),
     )
 
-    response = ollama.chat(
+    response: ChatResponse = chat(
         model=model,
         messages=messages,
         tools=tools,
+        think=True,
     )
 
-    message = response["message"]
+    messages.append(response.message)
 
-    messages.append(message)
+    if response.message.tool_calls:
+        for tc in response.message.tool_calls:
+            if tc.function.name in available_functions:
+                result = available_functions[tc.function.name](**tc.function.arguments)
 
-    if message.get("tool_calls"):
-        for tool_call in message["tool_calls"]:
-            function_name = tool_call["function"]["name"]
-            arguments = tool_call["function"]["arguments"]
+                messages.append(
+                    Message(
+                        role="tool",
+                        tool_name=tc.function.name,
+                        content=str(result),
+                    )
+                )
+            else:
+                print("Sorry I couldn't find the right tool.")
 
-            print(f"\n[Agent wants to call: {function_name}]")
-            print(f"[Arguments: {arguments}]")
-
-            function = available_tools.get(function_name)
-
-            if function is None:
-                print(f"Unknown tool: {function_name}")
-                continue
-
-            result = function(**arguments)
-
-            print(f"[Tool result: {result}]")
-
-            messages.append(
-                {
-                    "role": "tool",
-                    "content": json.dumps(result),
-                }
-            )
-
-        response = ollama.chat(
+        final_response = chat(
             model=model,
             messages=messages,
             tools=tools,
+            think=True,
         )
 
-        messages.append(response["message"])
+        messages.append(final_response.message)
 
-        print(response["message"]["content"])
-
+        print(final_response.message.content)
     else:
-        print(message["content"])
+        print(response.message.content)
