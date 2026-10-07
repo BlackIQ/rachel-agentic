@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict  # Pydantic Setti
 # Settings
 class Settings(BaseSettings):
     # Model
-    MODEL: str = "qwen3:4b"
+    MODEL: str = "rachel-1.1:4b"
 
     model_config = SettingsConfigDict(env_file=".env")
 
