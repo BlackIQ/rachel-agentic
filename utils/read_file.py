@@ -1,33 +1,23 @@
 # Libs
 from pathlib import Path  # Path
 
-# Application
-from base.schema import BaseSchema  # Base: Schema
-
 WORKSPACE = Path("workspace")
 WORKSPACE.mkdir(exist_ok=True)
 
 
-class ReadFileSchema(BaseSchema):
-    success: bool
-    path: str | None = None
-    content: str | None = None
-    error: str | None = None
+def read_file(filename: str) -> str:
+    """Read the content of an existing file in the workspace.
 
+    Args:
+        filename: The filename to read, for example file.txt
 
-def read_file(filename: str) -> ReadFileSchema:
+    Returns:
+        The file content, or an error message if the file does not exist.
+    """
+
     path = WORKSPACE / filename
 
     if not path.exists():
-        return ReadFileSchema(
-            success=False,
-            error="File not found",
-        )
+        return f"Error: File '{filename}' not found."
 
-    content = path.read_text(encoding="utf-8")
-
-    return ReadFileSchema(
-        success=True,
-        path=str(path),
-        content=content,
-    )
+    return path.read_text(encoding="utf-8")

@@ -1,24 +1,22 @@
 # Libs
 from pathlib import Path  # Path
 
-# Application
-from base.schema import BaseSchema  # Base: Schema
-
 WORKSPACE = Path("workspace")
 WORKSPACE.mkdir(exist_ok=True)
 
 
-class WriteFileSchema(BaseSchema):
-    success: bool
-    path: str | None = None
+def write_file(filename: str, content: str) -> str:
+    """Create or overwrite a file with the given content.
 
+    Args:
+        filename: The filename, for example file.txt
+        content: The content that should be written into the file.
 
-def write_file(filename: str, content: str) -> WriteFileSchema:
+    Returns:
+        A success message with the path, or an error message.
+    """
+
     path = WORKSPACE / filename
-
     path.write_text(content, encoding="utf-8")
 
-    return WriteFileSchema(
-        success=True,
-        path=str(path),
-    )
+    return f"Successfully wrote to {path}"
