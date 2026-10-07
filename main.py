@@ -57,13 +57,12 @@ available_functions = {
     "get_conditions": get_conditions,
 }
 
-print(f"Rachel ({model}) is ready. Type 'exit' or 'quit' to stop.\n")
-
+print(f"Rachel ({model}) is ready. 'exit' to stop.\n")
 
 while True:
-    user_input = input("User: ").strip()
+    user_input = input(">>> ").strip()
 
-    if user_input.lower() in {"exit", "quit"}:
+    if user_input.lower() in {"exit"}:
         break
 
     messages.append(
