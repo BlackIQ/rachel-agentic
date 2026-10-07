@@ -94,7 +94,15 @@ while True:
                     )
                 )
             else:
-                print("Sorry I couldn't find the right tool.")
+                messages.append(
+                    Message(
+                        role="tool",
+                        content=f"Tool {tc.function.name} not found",
+                        tool_name=tc.function.name,
+                    ),
+                )
+
+                print(f"Tool {tc.function.name} not found")
 
         final_response = chat(
             model=model,
