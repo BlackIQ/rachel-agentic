@@ -5,17 +5,18 @@ import requests  # Requests
 from core.settings import settings  # Core: Settings
 
 
-def get_pico_temperature():
-    """Get the current raspberry pi pico device temperature information.
+def get_pico_resources():
+    """Get the current raspberry pi pico device resources information.
 
     Returns:
-        A dictionary containing current raspberry pi pico device temperature information.
+        A dictionary containing current raspberry pi pico device resources information.
         The response includes:
-        - temperature: home temperature
+        - free: free memory
+        - allocated: allocated memory
     """
 
     response = requests.get(
-        f"{settings.PICO_IP}/pico/temperature",
+        f"{settings.PICO_IP}/system/memory",
     )
 
     data = response.json()
