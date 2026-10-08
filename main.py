@@ -7,6 +7,7 @@ from core.settings import settings  # Core: Settings
 from tools.weather import get_weather  # Utils: Teperature
 from tools.home import get_home_temperature  # Utils: Home
 from tools.pico import get_pico_resources  # Utils: Pico
+from tools.led import turn_led_on, turn_led_off  # Utils: LED
 
 model = settings.MODEL
 
@@ -16,12 +17,16 @@ tools = [
     get_weather,
     get_home_temperature,
     get_pico_resources,
+    turn_led_on,
+    turn_led_off,
 ]
 
 available_functions = {
     "get_weather": get_weather,
     "get_home_temperature": get_home_temperature,
     "get_pico_resources": get_pico_resources,
+    "turn_led_on": turn_led_on,
+    "turn_led_off": turn_led_off,
 }
 
 print(f"Rachel ({model}) is ready. 'exit' to stop.\n")
