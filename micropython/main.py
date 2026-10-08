@@ -126,7 +126,6 @@ def not_found(request):
     return {"message": "Not found"}, 404
 
 
-
 lcd.clear()
 
 lcd.putstr("Rachel Agent!")
