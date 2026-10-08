@@ -15,7 +15,7 @@ def get_home_temperature():
     """
 
     response = requests.get(
-        f"{settings.PICO_IP}/api/home/temperature",
+        f"{settings.PICO_IP}/home/temperature",
     )
 
     data = response.json()
@@ -33,7 +33,7 @@ def get_home_humidity():
     """
 
     response = requests.get(
-        f"{settings.PICO_IP}/api/home/humidity",
+        f"{settings.PICO_IP}/home/humidity",
     )
 
     data = response.json()
