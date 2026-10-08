@@ -122,8 +122,18 @@ def memory(request):
 
 
 @app.errorhandler(404)
-async def not_found(request):
+def not_found(request):
     return {"message": "Not found"}, 404
+
+
+@app.before_request
+def new_request(request):
+    white = LEDS.get("white")
+
+    white.on()
+    sleep(0.25)
+    white.off()
+    sleep(0.25)
 
 
 lcd.clear()
