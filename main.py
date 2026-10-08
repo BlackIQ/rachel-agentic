@@ -1,23 +1,21 @@
 # Libs
+import json  # Json
 from ollama import chat, ChatResponse, Message  # Ollama
 
 # Application
 from core.settings import settings  # Core: Settings
-from utils.get_temperature import get_temperature  # Utils: Teperature
-from utils.get_conditions import get_conditions  # Utils: Condition
+from utils.get_weather import get_weather  # Utils: Teperature
 
 model = settings.MODEL
 
 messages: list[Message] = []
 
 tools = [
-    get_temperature,
-    get_conditions,
+    get_weather,
 ]
 
 available_functions = {
-    "get_temperature": get_temperature,
-    "get_conditions": get_conditions,
+    "get_weather": get_weather,
 }
 
 print(f"Rachel ({model}) is ready. 'exit' to stop.\n")
@@ -53,7 +51,7 @@ while True:
                     Message(
                         role="tool",
                         tool_name=tc.function.name,
-                        content=str(result),
+                        content=json.dumps(result),
                     )
                 )
             else:
