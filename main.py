@@ -5,6 +5,8 @@ from ollama import chat, ChatResponse, Message  # Ollama
 # Application
 from core.settings import settings  # Core: Settings
 from utils.weather import get_weather  # Utils: Teperature
+from utils.home import get_home_temperature, get_home_humidity  # Utils: Home
+from utils.pico import get_pico_temperature  # Utils: Pico
 
 model = settings.MODEL
 
@@ -12,10 +14,16 @@ messages: list[Message] = []
 
 tools = [
     get_weather,
+    get_home_temperature,
+    get_home_humidity,
+    get_pico_temperature,
 ]
 
 available_functions = {
     "get_weather": get_weather,
+    "get_home_temperature": get_home_temperature,
+    "get_home_humidity": get_home_humidity,
+    "get_pico_temperature": get_pico_temperature,
 }
 
 print(f"Rachel ({model}) is ready. 'exit' to stop.\n")
