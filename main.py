@@ -50,7 +50,7 @@ while True:
         model=model,
         messages=messages,
         tools=tools,
-        think=True,
+        # think=True,
     )
 
     messages.append(response.message)
@@ -82,7 +82,7 @@ while True:
             model=model,
             messages=messages,
             tools=tools,
-            think=True,
+            # think=True,
         )
 
         messages.append(final_response.message)

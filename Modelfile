@@ -1,6 +1,4 @@
-# FROM qwen3:4b # Very good
-FROM qwen2.5:3b # Lighter
-# FROM qwen2.5:1.5b # More lighter
+FROM qwen2.5:3b
 
 PARAMETER num_ctx 4096
 PARAMETER temperature 0.2

@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict  # Pydantic Setti
 # Settings
 class Settings(BaseSettings):
     # Model
-    MODEL: str = "rachel-1.1:4b"
+    MODEL: str = "rachel-1.2:3b"
     WEATHER_APIKEY: str = ""
     PICO_IP: str = ""
 

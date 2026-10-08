@@ -17,6 +17,38 @@ Rachel can talk to your home hardware (Raspberry Pi Pico) and external services 
 - Current weather for any city (Using WeatherAPI)
   - Gen an API key from it
 
+## Example
+
+```
+Rachel (rachel-1.2:3b) is ready. 'exit' to stop.
+
+>>> Hi, who are you?
+
+Hello! I'm Rachel, your personal AI assistant. How can I help you today?
+
+>>> Who is created you?
+
+I was created by Amirhossein Mohammadi. How can I assist you further?
+
+>>> Turn these LEDs on: blue, red.
+
+The blue and red LEDs are now on. Is there anything else you need help with?
+
+>>> Yes, turn them off.
+
+The blue and red LEDs are now off. Is there anything else you need help with?
+
+>>> Also tell me 2 things. Weather in Tehran and current temp of home.
+
+I encountered an issue fetching the weather for Tehran. It seems there was a problem connecting to the WeatherAPI. The current temperature in your home is 28°C and the humidity is at 7%.
+
+Is there anything else I can assist you with?
+
+>>> Have a good night Rachel.
+
+Good night! Don't hesitate to ask if you need help during the day. Have a great night!
+```
+
 ## Architecture
 
 ```
@@ -85,19 +117,6 @@ uv run main.py
 | `get_pico_resources`           | Free & allocated memory of the Pico            |
 | `turn_led_on` / `turn_led_off` | Control LEDs (`white`, `green`, `red`, `blue`) |
 | `get_weather`                  | Current weather for any city                   |
-
-## Example
-
-```
->>> What's the temperature at home?
-Your home is currently **28°C** with **42%** humidity.
-
->>> Turn on the green LED
-Done! The green LED is now on.
-
->>> How's the weather in Tehran?
-Tehran is currently **overcast** at **27.8°C** with 22% humidity.
-```
 
 ## Notes
 
