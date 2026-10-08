@@ -37,6 +37,8 @@ while True:
     if user_input.lower() in {"exit"}:
         break
 
+    print("")
+
     messages.append(
         Message(
             role="user",
@@ -48,8 +50,11 @@ while True:
         model=model,
         messages=messages,
         tools=tools,
-        think=True,
+        # think=True,
     )
+
+    print(f"\nThinking:")
+    print(response.message.thinking)
 
     messages.append(response.message)
 
@@ -80,7 +85,7 @@ while True:
             model=model,
             messages=messages,
             tools=tools,
-            think=True,
+            # think=True,
         )
 
         messages.append(final_response.message)
