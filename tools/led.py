@@ -5,6 +5,7 @@ import requests  # Requests
 from core.settings import settings  # Core: Settings
 
 VALID_LEDS = {
+    "white",
     "green",
     "red",
     "blue",
@@ -16,7 +17,7 @@ def turn_led_on(name: str):
 
     Args:
         name: The name of the LED to turn on.
-              Must be one of: "green", "red", "blue".
+              Must be one of: "green", "red", "blue", "white".
 
     Returns:
         A dictionary with the result of the operation.
@@ -60,7 +61,7 @@ def turn_led_off(name: str):
 
     Args:
         name: The name of the LED to turn off.
-              Must be one of: "green", "red", "blue".
+              Must be one of: "green", "red", "blue", "white".
 
     Returns:
         A dictionary with the result of the operation.
