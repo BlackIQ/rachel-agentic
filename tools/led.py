@@ -1,5 +1,6 @@
 # Libs
 import requests  # Requests
+from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
@@ -37,23 +38,37 @@ def turn_led_on(name: str):
             "message": f"Unknown LED: {name}",
         }
 
-    response = requests.post(
-        f"{settings.PICO_IP}/api/leds/{name}/on",
-    )
+    try:
+        response = requests.post(
+            f"{settings.PICO_IP}/api/leds/{name}/on",
+            timeout=5,
+        )
 
-    data = response.json()
+        data = response.json()
 
-    if response.ok:
+        if response.ok:
+            return {
+                "success": True,
+                "message": data.get("message", f"{name} is now on"),
+            }
+
         return {
-            "success": True,
-            "message": data.get("message"),
+            "success": False,
+            "error": "pico_error",
+            "message": data.get("message", "Unknown error from Pico"),
         }
-
-    return {
-        "success": False,
-        "error": "pico_error",
-        "message": data.get("message"),
-    }
+    except RequestException as e:
+        return {
+            "success": False,
+            "error": "pico_unreachable",
+            "message": f"Could not reach the Pico device: {str(e)}",
+        }
+    except ValueError:
+        return {
+            "success": False,
+            "error": "invalid_response",
+            "message": "Pico returned invalid JSON",
+        }
 
 
 def turn_led_off(name: str):
@@ -81,20 +96,34 @@ def turn_led_off(name: str):
             "message": f"Unknown LED: {name}",
         }
 
-    response = requests.post(
-        f"{settings.PICO_IP}/api/leds/{name}/off",
-    )
+    try:
+        response = requests.post(
+            f"{settings.PICO_IP}/api/leds/{name}/off",
+            timeout=5,
+        )
 
-    data = response.json()
+        data = response.json()
 
-    if response.ok:
+        if response.ok:
+            return {
+                "success": True,
+                "message": data.get("message", f"{name} is now off"),
+            }
+
         return {
-            "success": True,
-            "message": data.get("message"),
+            "success": False,
+            "error": "pico_error",
+            "message": data.get("message", "Unknown error from Pico"),
         }
-
-    return {
-        "success": False,
-        "error": "pico_error",
-        "message": data.get("message"),
-    }
+    except RequestException as e:
+        return {
+            "success": False,
+            "error": "pico_unreachable",
+            "message": f"Could not reach the Pico device: {str(e)}",
+        }
+    except ValueError:
+        return {
+            "success": False,
+            "error": "invalid_response",
+            "message": "Pico returned invalid JSON",
+        }

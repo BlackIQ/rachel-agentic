@@ -1,5 +1,6 @@
 # Libs
 import requests  # Requests
+from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
@@ -15,10 +16,29 @@ def get_pico_resources():
         - allocated: allocated memory
     """
 
-    response = requests.get(
-        f"{settings.PICO_IP}/api/system/memory",
-    )
+    try:
+        response = requests.get(
+            f"{settings.PICO_IP}/api/system/memory",
+            timeout=5,
+        )
 
-    data = response.json()
+        response.raise_for_status()
 
-    return data
+        data = response.json()
+
+        return {
+            "success": True,
+            "data": data,
+        }
+    except RequestException as e:
+        return {
+            "success": False,
+            "error": "pico_unreachable",
+            "message": f"Could not reach the Pico device: {str(e)}",
+        }
+    except ValueError:
+        return {
+            "success": False,
+            "error": "invalid_response",
+            "message": "Pico returned invalid JSON",
+        }
