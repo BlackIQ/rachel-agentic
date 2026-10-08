@@ -1,15 +1,12 @@
-# Machine
-from machine import Pin, I2C  # Pin, I2C
-from picozero import pico_temp_sensor, pico_led  # Pico Things
-import rp2  # Raspberry Pi 2 Pico
-
-# Networking
-import network  # Network
-import socket  # Socket
-
 # Libs
+from machine import Pin, I2C  # Machine
+from picozero import pico_led  # Pico Things
 from time import sleep  # Time
-import sys  # Sysyem
+import network  # Network
+import gc  # Monitoring
+
+# Microdot
+from microdot import Microdot  # Like Flask/FastAPI
 
 # Sensors
 import dht  # HDT
@@ -17,35 +14,30 @@ import dht  # HDT
 # Customs
 from machine_i2c_lcd import I2cLcd  # Liquid Crystal
 
-# ===== LCD Setup =====
-
-I2C_ADDR = 0x27
-I2C_NUM_ROWS = 2
-I2C_NUM_COLS = 16
+# ===== LCD Setup ====
 
 i2c = I2C(sda=Pin(0), scl=Pin(1), freq=400000)
 
-lcd = I2cLcd(i2c, I2C_ADDR, I2C_NUM_ROWS, I2C_NUM_COLS)
+lcd = I2cLcd(i2c, 0x27, 2, 16)
 
-lcd.display_off()
-lcd.backlight_off()
+lcd.display_on()
+lcd.backlight_on()
+
+lcd.putstr("Rachel Agent!")
+lcd.move_to(0, 1)
+lcd.putstr("Booting...")
 
 # ===== DHT Setup =====
-
-sensor_dht_pin = Pin(15)
-sensor_dht = dht.DHT11(sensor_dht_pin)
+sensor_dht = dht.DHT11(Pin(15))
 
 # ===== LED Setup =====
 
-white_led = Pin(18, Pin.OUT)
-green_led = Pin(19, Pin.OUT)
-red_led = Pin(20, Pin.OUT)
-blue_led = Pin(21, Pin.OUT)
-
-white_led.on()
-green_led.on()
-red_led.on()
-blue_led.on()
+LEDS = {
+    "white": Pin(18, Pin.OUT),
+    "green": Pin(19, Pin.OUT),
+    "red": Pin(20, Pin.OUT),
+    "blue": Pin(21, Pin.OUT),
+}
 
 # ===== WLAN Setup ======
 
@@ -53,19 +45,12 @@ SSID = "Maria"
 PASSWORD = "0481244859"
 
 
-# Connect
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(SSID, PASSWORD)
 
     while not wlan.isconnected():
-        if rp2.bootsel_button() == 1:
-            print("Good bye.")
-            sys.exit()
-
-        print("Connecting...")
-
         pico_led.on()
         sleep(0.1)
         pico_led.off()
@@ -73,135 +58,80 @@ def connect():
 
     ip = wlan.ifconfig()[0]
 
-    print(f"Device IP Address: {ip}")
-
     pico_led.on()
 
-    return ip
+    lcd.clear()
+
+    lcd.putstr("Rachel Agent!")
+    lcd.move_to(0, 1)
+    lcd.putstr(ip)
 
 
-# Socket
-def open_socket(ip):
-    address = ("", 80)
+# ===== API =====
 
-    connection = socket.socket()
-    connection.bind(address)
-    connection.listen(1)
-
-    print("Socket is open")
-
-    return connection
+app = Microdot()
 
 
-# ===== Responses =====
+@app.get("/")
+def home(request):
+    return {"message": "Welcome to Rachel Pico!"}
 
 
-def http_response(body, content_type="text/html"):
-    return "HTTP/1.1 200 OK\r\n" f"Content-Type: {content_type}\r\n" "\r\n" + body
-
-
-def not_found():
-    return (
-        "HTTP/1.1 404 Not Found\r\n"
-        "Content-Type: text/plain\r\n"
-        "\r\n"
-        "404 Not Found"
-    )
-
-
-# ===== Routes =====
-
-
-def home():
-    return http_response(
-        f'{{"message": "Welcome to my firmware!"}}', "application/json"
-    )
-
-
-def pico_temperature():
-    temp = pico_temp_sensor.temp
-
-    return http_response(f'{{"temperature": {temp}}}', "application/json")
-
-
-def home_temperature():
+@app.get("/api/temperature")
+def home_sensor(request):
     sensor_dht.measure()
 
-    temp = sensor_dht.temperature()
-
-    return http_response(f'{{"temperature": {temp}}}', "application/json")
-
-
-def home_humidity():
-    sensor_dht.measure()
-
-    hum = sensor_dht.humidity()
-
-    return http_response(f'{{"humidity": {hum}}}', "application/json")
+    return {
+        "temperature": sensor_dht.temperature(),
+        "humidity": sensor_dht.humidity(),
+    }
 
 
-# ===== Router =====
+@app.post("/api/leds/<name>/on")
+def led_on(request, name):
+    led = LEDS.get(name)
 
-routes = {
-    ("GET", "/"): home,
-    ("GET", "/api/pico/temperature"): pico_temperature,
-    ("GET", "/api/home/temperature"): home_temperature,
-    ("GET", "/api/home/humidity"): home_humidity,
-}
+    if led is None:
+        return {"message": "Unknown led"}, 404
 
+    led.on()
 
-def router(method, path):
-    handler = routes.get((method, path))
-
-    if handler is None:
-        return not_found()
-
-    return handler()
+    return {"message": f"{name} is now on"}
 
 
-# ===== Server =====
+@app.post("/api/leds/<name>/off")
+def led_off(request, name):
+    led = LEDS.get(name)
+
+    if led is None:
+        return {"message": "Unknown led"}, 404
+
+    led.off()
+
+    return {"message": f"{name} is now off"}
 
 
-# HTTP Server
-def serve(connection):
-    while True:
-        client = connection.accept()[0]
+@app.get("/api/system/memory")
+def memory(request):
+    gc.collect()
 
-        try:
-            request = client.recv(1024)
-
-            print(request)
-
-            try:
-                request_line = request.split(b"\r\n")[0]
-                method, path, _ = request_line.split()
-
-                method = method.decode()
-                path = path.decode()
-            except IndexError:
-                client.close()
-                continue
-
-            response = router(method, path)
-
-            client.send(response)
-        except OSError as e:
-            print("Socket error:", e)
-        finally:
-            client.close()
+    return {
+        "free": gc.mem_free(),
+        "allocated": gc.mem_alloc(),
+    }
 
 
-# Starting this fucking bitch
-ip = connect()
+@app.errorhandler(404)
+async def not_found(request):
+    return {"message": "Not found"}, 404
 
-lcd.display_on()
-lcd.backlight_on()
 
 lcd.clear()
 
 lcd.putstr("Rachel Agent!")
 lcd.move_to(0, 1)
-lcd.putstr(ip)
+lcd.putstr("Connecting...")
 
-connection = open_socket(ip)
-serve(connection)
+connect()
+
+app.run(port=80)
