@@ -4,10 +4,10 @@ from ollama import chat, ChatResponse, Message  # Ollama
 
 # Application
 from core.settings import settings  # Core: Settings
-from tools.weather import get_weather  # Utils: Teperature
-from tools.home import get_home_temperature  # Utils: Home
-from tools.pico import get_pico_resources  # Utils: Pico
-from tools.led import turn_led_on, turn_led_off  # Utils: LED
+from tools.weather import get_weather  # Tool: Weather
+from tools.home import get_home_temperature  # Tools: Home
+from tools.pico import get_pico_resources  # Tools: Pico
+from tools.led import turn_led_on, turn_led_off  # Tools: LED
 
 model = settings.MODEL
 
