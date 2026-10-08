@@ -38,6 +38,7 @@ User > Ollama (rachel-1.1:4b) > Tool Calling (Chatting) > Python Tools > Raspber
 Make sure you have **Ollama** installed.
 
 > You can set an variable in your shell to don't put your device under heavy pressure:
+>
 > Just: `export OLLAMA_NUM_PARALLEL=1`
 
 ### 1. Agent (Python side)
