@@ -41,8 +41,8 @@ LEDS = {
 
 # ===== WLAN Setup ======
 
-SSID = "Maria"
-PASSWORD = "0481244859"
+SSID = ""
+PASSWORD = ""
 
 
 def connect():
@@ -125,15 +125,6 @@ def memory(request):
 def not_found(request):
     return {"message": "Not found"}, 404
 
-
-@app.before_request
-def new_request(request):
-    white = LEDS.get("white")
-
-    white.on()
-    sleep(0.25)
-    white.off()
-    sleep(0.25)
 
 
 lcd.clear()
