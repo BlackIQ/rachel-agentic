@@ -1,0 +1,99 @@
+# Libs
+import requests  # Requests
+
+# Application
+from core.settings import settings  # Core: Settings
+
+VALID_LEDS = {
+    "green",
+    "red",
+    "blue",
+}
+
+
+def turn_led_on(name: str):
+    """Turn on a specific LED on the Rachel Pico device.
+
+    Args:
+        name: The name of the LED to turn on.
+              Must be one of: "green", "red", "blue".
+
+    Returns:
+        A dictionary with the result of the operation.
+        On success:
+            - success: True
+            - message: Confirmation message from the device
+        On failure:
+            - success: False
+            - error: Error code ("unknown_led" or "pico_error")
+            - message: Human-readable error message
+    """
+
+    if name not in VALID_LEDS:
+        return {
+            "success": False,
+            "error": "unknown_led",
+            "message": f"Unknown LED: {name}",
+        }
+
+    response = requests.post(
+        f"{settings.PICO_IP}/api/leds/{name}/on",
+    )
+
+    data = response.json()
+
+    if response.ok:
+        return {
+            "success": True,
+            "message": data.get("message"),
+        }
+
+    return {
+        "success": False,
+        "error": "pico_error",
+        "message": data.get("message"),
+    }
+
+
+def turn_led_off(name: str):
+    """Turn off a specific LED on the Rachel Pico device.
+
+    Args:
+        name: The name of the LED to turn off.
+              Must be one of: "green", "red", "blue".
+
+    Returns:
+        A dictionary with the result of the operation.
+        On success:
+            - success: True
+            - message: Confirmation message from the device
+        On failure:
+            - success: False
+            - error: Error code ("unknown_led" or "pico_error")
+            - message: Human-readable error message
+    """
+
+    if name not in VALID_LEDS:
+        return {
+            "success": False,
+            "error": "unknown_led",
+            "message": f"Unknown LED: {name}",
+        }
+
+    response = requests.post(
+        f"{settings.PICO_IP}/api/leds/{name}/off",
+    )
+
+    data = response.json()
+
+    if response.ok:
+        return {
+            "success": True,
+            "message": data.get("message"),
+        }
+
+    return {
+        "success": False,
+        "error": "pico_error",
+        "message": data.get("message"),
+    }
