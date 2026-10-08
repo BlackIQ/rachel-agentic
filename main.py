@@ -4,7 +4,7 @@ from ollama import chat, ChatResponse, Message  # Ollama
 
 # Application
 from core.settings import settings  # Core: Settings
-from utils.get_weather import get_weather  # Utils: Teperature
+from utils.weather import get_weather  # Utils: Teperature
 
 model = settings.MODEL
 
