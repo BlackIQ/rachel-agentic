@@ -1,31 +1,106 @@
 # Agentic Rachel
 
-Working on some ideas and testing things to bring my dear dead Rachel back...
+A personal AI assistant created with **Ollama** and **Qwen3**.
 
-I am using **qwen3:4b** and **Ollama**.
+Rachel can talk to your home hardware (Raspberry Pi Pico) and external services if added.
 
-> Docs: [Ollama Docs](https://docs.ollama.com/capabilities/tool-calling)
+## Features
+
+- Natural language conversation with tool calling
+- Home temperature & humidity from RPI Pico (DHT11 sensor)
+- Pico system resources (memory only)
+- Control LEDs on the Pico (For now only)
+  - White
+  - Blue
+  - Red
+  - Green
+- Current weather for any city (Using WeatherAPI)
+  - Gen an API key from it
+
+## Architecture
 
 ```
-➜  agentic git:(main) uv run main.py
-Rachel (rachel-1.1:4b) is ready. 'exit' to stop.
-
->>> Tell me how is temp of my home.
-Your home temperature is currently 28 degrees. Let me know if you need anything else! 😊
-
->>> How about temp of the Pico device?
-The Raspberry Pi Pico device is currently at **32.19°C**. That’s a bit warmer than your home temperature (28°C), but everything seems to be running smoothly! 😊 Let me know if you'd like to check anything else.
-
->>> I want the humidity of the home too.
-Your home humidity is currently **6%** — that’s quite low! Most indoor spaces stay around 30–50% humidity for comfort. Would you like me to check if anything needs adjustment? 😊
-
->>> Last thing, tell me how is weather in the capital of Iran.
-The current weather in Tehran is **overcast** with a temperature of **27.8°C** and **22% humidity**. It’s a bit dry today! 😊 Let me know if you'd like to check anything else.
-
->>> All done. Thank you. For the end, just introduce yourself.
-Hello! I'm **Rachel**, your friendly AI assistant created by Amirhossein Mohammadi. I help with natural conversations and quick checks like home temperature, humidity, or weather. 😊
-Thank you for chatting with me — have a wonderful day! 🌟
-
->>> exit
-➜  agentic git:(main)
+User > Ollama (rachel-1.1:4b) > Tool Calling (Chatting) > Python Tools > Raspberry Pi Pico / WeatherAPI
 ```
+
+- **Agent side**: Python + Ollama (tool calling)
+- **Device side**: MicroPython + Microdot running on Raspberry Pi Pico
+
+## Hardware
+
+- Raspberry Pi Pico W (for wireless)
+- DHT11 temperature & humidity sensor
+- 4 LEDs (white, green, red, blue)
+- I2C LCD 16x2 (to see IP and welcome)
+
+## Setup
+
+Make sure you have **Ollama** installed.
+
+### 1. Agent (Python side)
+
+```bash
+git clone https://github.com/BlackIQ/rachel-agentic.git
+cd rachel-agentic
+uv sync
+```
+
+Copy `.env.example` to `.env` and fill:
+
+```env
+WEATHER_APIKEY=your_weatherapi_key
+PICO_IP=http://192.168.1.50
+```
+
+> `PICO_IP` must include the protocol (`http://`).
+
+Create the model (recommended):
+
+```bash
+ollama create rachel-1.1:4b -f Modelfile
+```
+
+Run:
+
+```bash
+uv run main.py
+```
+
+### 2. Pico side
+
+1. Flash MicroPython on the Pico
+2. Copy the contents of `micropython/` to the Pico (everything)
+3. Set your WiFi credentials in `main.py` (SSID & PASSWORD)
+4. Reset the Pico. Then it will show its IP on the LCD
+
+## Available Tools
+
+| Tool                           | Description                                    |
+| ------------------------------ | ---------------------------------------------- |
+| `get_home_temperature`         | Temperature + Humidity from DHT11              |
+| `get_pico_resources`           | Free & allocated memory of the Pico            |
+| `turn_led_on` / `turn_led_off` | Control LEDs (`white`, `green`, `red`, `blue`) |
+| `get_weather`                  | Current weather for any city                   |
+
+## Example
+
+```
+>>> What's the temperature at home?
+Your home is currently **28°C** with **42%** humidity.
+
+>>> Turn on the green LED
+Done! The green LED is now on.
+
+>>> How's the weather in Tehran?
+Tehran is currently **overcast** at **27.8°C** with 22% humidity.
+```
+
+## Notes
+
+- This is a personal experimental project to bring back the spirit of the old Rachel assistant.
+- FastAPI is included in dependencies for future API mode.
+- The Pico firmware uses Microdot (a lightweight Flask-like framework for MicroPython).
+
+---
+
+Made with ❤️ by Amirhossein Mohammadi
