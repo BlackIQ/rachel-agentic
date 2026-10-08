@@ -4,9 +4,9 @@ from ollama import chat, ChatResponse, Message  # Ollama
 
 # Application
 from core.settings import settings  # Core: Settings
-from utils.weather import get_weather  # Utils: Teperature
-from utils.home import get_home_temperature  # Utils: Home
-from utils.pico import get_pico_resources  # Utils: Pico
+from tools.weather import get_weather  # Utils: Teperature
+from tools.home import get_home_temperature  # Utils: Home
+from tools.pico import get_pico_resources  # Utils: Pico
 
 model = settings.MODEL
 
