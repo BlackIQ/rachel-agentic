@@ -16,7 +16,7 @@ def get_home_temperature():
     """
 
     response = requests.get(
-        f"{settings.PICO_IP}/temperature",
+        f"{settings.PICO_IP}/api/temperature",
     )
 
     data = response.json()

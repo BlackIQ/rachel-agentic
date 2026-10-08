@@ -37,7 +37,7 @@ def turn_led_on(name: str):
         }
 
     response = requests.post(
-        f"{settings.PICO_IP}/leds/{name}/on",
+        f"{settings.PICO_IP}/api/leds/{name}/on",
     )
 
     data = response.json()
@@ -81,7 +81,7 @@ def turn_led_off(name: str):
         }
 
     response = requests.post(
-        f"{settings.PICO_IP}/leds/{name}/off",
+        f"{settings.PICO_IP}/api/leds/{name}/off",
     )
 
     data = response.json()

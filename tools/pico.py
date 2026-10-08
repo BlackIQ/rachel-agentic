@@ -16,7 +16,7 @@ def get_pico_resources():
     """
 
     response = requests.get(
-        f"{settings.PICO_IP}/system/memory",
+        f"{settings.PICO_IP}/api/system/memory",
     )
 
     data = response.json()
