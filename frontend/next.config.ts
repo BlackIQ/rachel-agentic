@@ -6,4 +6,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
 };
 
+module.exports = {
+  allowedDevOrigins: ["10.1.30.253"],
+};
+
 export default nextConfig;
