@@ -2,42 +2,82 @@
 
 import { useMemo } from "react";
 import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
 
 export default function ThemeRegistry({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)", {
-    noSsr: true,
-  });
-
   const theme = useMemo(
     () =>
       createTheme({
         cssVariables: true,
         palette: {
-          mode: prefersDarkMode ? "dark" : "light",
+          mode: "dark",
           primary: {
-            main: prefersDarkMode ? "#90b4ff" : "#315fce",
+            main: "#7c9cff",
+            light: "#a8bfff",
+            dark: "#5a7ae6",
+            contrastText: "#0b0d12",
+          },
+          secondary: {
+            main: "#9b8cff",
           },
           background: {
-            default: prefersDarkMode ? "#101114" : "#f7f8fa",
-            paper: prefersDarkMode ? "#191b20" : "#ffffff",
+            default: "#0c0e12",
+            paper: "#14171e",
           },
-          divider: prefersDarkMode
-            ? "rgba(255,255,255,0.09)"
-            : "rgba(20,30,50,0.10)",
+          text: {
+            primary: "#e8eaef",
+            secondary: "#9aa3b5",
+          },
+          divider: "rgba(255,255,255,0.08)",
+          success: {
+            main: "#5dcea0",
+          },
+          error: {
+            main: "#f07178",
+          },
         },
         shape: {
-          borderRadius: 12,
+          borderRadius: 14,
         },
         typography: {
-          fontFamily: "Roboto, Arial, sans-serif",
+          fontFamily:
+            'Inter, Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
+          h4: { fontWeight: 700, letterSpacing: "-0.02em" },
+          h6: { fontWeight: 600 },
+          body1: { lineHeight: 1.65 },
+          body2: { lineHeight: 1.55 },
+          caption: { letterSpacing: "0.02em" },
+        },
+        components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                textTransform: "none",
+                fontWeight: 600,
+                borderRadius: 12,
+              },
+            },
+          },
+          MuiIconButton: {
+            styleOverrides: {
+              root: {
+                borderRadius: 12,
+              },
+            },
+          },
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                backgroundImage: "none",
+              },
+            },
+          },
         },
       }),
-    [prefersDarkMode],
+    [],
   );
 
   return (
