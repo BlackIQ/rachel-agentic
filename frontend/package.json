@@ -1,5 +1,6 @@
 {
-  "name": "frontend",
+  "name": "rachel_frontend",
+  "description": "Rachel Agent (Assistant) Frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
