@@ -1,6 +1,6 @@
 # Libs
 from fastapi import APIRouter, Depends, HTTPException, status  # FastAPI
-from sqlalchemy.orm import Session  # SQLAlchemy ORM
+from sqlalchemy.orm import Session, joinedload  # SQLAlchemy ORM
 from datetime import datetime, timezone  # Datetime
 from uuid import UUID  # UUID
 
@@ -17,14 +17,17 @@ router = APIRouter(
 
 
 # GET - All chats
-@router.get("", response_model=list[ChatRead])
+@router.get(
+    "",
+    response_model=list[ChatRead],
+)
 async def all_chats(
     db: Session = Depends(get_db),
 ):
     db_chats = (
         db.query(Chat)
         .order_by(
-            Chat.created_at.asc(),
+            Chat.updated_at.asc(),
         )
         .where(
             Chat.deleted_at.is_(None),
@@ -36,7 +39,11 @@ async def all_chats(
 
 
 # POST - Create chat
-@router.post("", response_model=ChatRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "",
+    response_model=ChatRead,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_chats(
     chat_data: ChatCreate,
     db: Session = Depends(get_db),
@@ -51,13 +58,17 @@ async def create_chats(
 
 
 # GET - Get chat
-@router.get("/{chat_id}", response_model=ChatRead)
+@router.get(
+    "/{chat_id}",
+    response_model=ChatRead,
+)
 async def get_chat(
     chat_id: UUID,
     db: Session = Depends(get_db),
 ):
     db_chat = (
         db.query(Chat)
+        .options(joinedload(Chat.messages))
         .where(
             Chat.id == chat_id,
             Chat.deleted_at.is_(None),
@@ -75,7 +86,10 @@ async def get_chat(
 
 
 # PATCH - Update chat
-@router.patch("/{chat_id}", response_model=ChatRead)
+@router.patch(
+    "/{chat_id}",
+    response_model=ChatRead,
+)
 async def update_chat(
     chat_id: UUID,
     chat_data: ChatUpdate,
@@ -106,7 +120,10 @@ async def update_chat(
 
 
 # DELETE - Delete chat
-@router.delete("/{chat_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{chat_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
 async def delete_chat(
     chat_id: UUID,
     db: Session = Depends(get_db),
