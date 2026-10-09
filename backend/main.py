@@ -2,13 +2,18 @@
 from fastapi import FastAPI  # FastAPI
 from fastapi.middleware.cors import CORSMiddleware  # FastAPI CORS
 
+# Application
+from routers import application, chat, message  # Routers
+
 app = FastAPI(
     title="Rachel Agent API",
     version="0.1.0",
     summary="Backend of Rachel Agent API",
     description="Bringing my old Rachel back alive! Rachel is an Agent to communicate with my home hardware things!",
     openapi_tags=[
-        {"name": "Application", "description": "Application things"},
+        {"name": "Application", "description": "Application endpoints"},
+        {"name": "Chat", "description": "Chat endpoints"},
+        {"name": "Message", "description": "Message endpoints"},
     ],
 )
 
@@ -24,7 +29,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
 )
 
-
-@app.get("/", tags=["Application"])
-async def ping():
-    return {"message": "Rachel Agent API is running"}
+# Include routers
+app.include_router(application.router, prefix="")
+app.include_router(chat.router, prefix="/api")
+app.include_router(message.router, prefix="/api")
