@@ -27,6 +27,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
     ],
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Include routers
