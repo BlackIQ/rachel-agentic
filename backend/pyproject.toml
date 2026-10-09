@@ -5,10 +5,13 @@ description = "Rachel Agent (Assistant) Backend"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "alembic>=1.20.0",
     "fastapi[standard]>=0.142.4",
     "ollama>=0.6.3",
+    "psycopg2-binary>=2.9.13",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
     "python-dotenv>=1.2.4",
     "requests>=2.34.2",
+    "sqlalchemy>=2.1.4",
 ]
