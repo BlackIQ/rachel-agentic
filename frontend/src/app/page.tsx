@@ -1,5 +1,3 @@
-import { Button } from "@/components/Button";
-
 export default function Home() {
-  return <Button>Rachel Agent Frontend</Button>;
+  return <h1>Rachel Agent Frontend</h1>;
 }
