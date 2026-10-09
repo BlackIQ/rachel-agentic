@@ -1,92 +1,30 @@
 # Libs
-import json  # Json
-from ollama import chat, ChatResponse, Message  # Ollama
+from fastapi import FastAPI  # FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # FastAPI CORS
 
-# Application
-from core.settings import settings  # Core: Settings
-from tools.weather import get_weather  # Tool: Weather
-from tools.home import get_home_temperature  # Tools: Home
-from tools.pico import get_pico_resources  # Tools: Pico
-from tools.led import turn_led_on, turn_led_off  # Tools: LED
+app = FastAPI(
+    title="Rachel Agent API",
+    version="0.1.0",
+    summary="Backend of Rachel Agent API",
+    description="Bringing my old Rachel back alive! Rachel is an Agent to communicate with my home hardware things!",
+    openapi_tags=[
+        {"name": "Application", "description": "Application things"},
+    ],
+)
 
-model = settings.MODEL
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+)
 
-messages: list[Message] = []
 
-tools = [
-    get_weather,
-    get_home_temperature,
-    get_pico_resources,
-    turn_led_on,
-    turn_led_off,
-]
-
-available_functions = {
-    "get_weather": get_weather,
-    "get_home_temperature": get_home_temperature,
-    "get_pico_resources": get_pico_resources,
-    "turn_led_on": turn_led_on,
-    "turn_led_off": turn_led_off,
-}
-
-print(f"Rachel ({model}) is ready. 'exit' to stop.\n")
-
-while True:
-    user_input = input(">>> ").strip()
-
-    if user_input.lower() in {"exit"}:
-        break
-
-    print("")
-
-    messages.append(
-        Message(
-            role="user",
-            content=user_input,
-        ),
-    )
-
-    response: ChatResponse = chat(
-        model=model,
-        messages=messages,
-        tools=tools,
-        # think=True,
-    )
-
-    messages.append(response.message)
-
-    if response.message.tool_calls:
-        for tc in response.message.tool_calls:
-            if tc.function.name in available_functions:
-                result = available_functions[tc.function.name](**tc.function.arguments)
-
-                messages.append(
-                    Message(
-                        role="tool",
-                        tool_name=tc.function.name,
-                        content=json.dumps(result),
-                    )
-                )
-            else:
-                messages.append(
-                    Message(
-                        role="tool",
-                        content=f"Tool {tc.function.name} not found",
-                        tool_name=tc.function.name,
-                    ),
-                )
-
-                print(f"Tool {tc.function.name} not found")
-
-        final_response = chat(
-            model=model,
-            messages=messages,
-            tools=tools,
-            # think=True,
-        )
-
-        messages.append(final_response.message)
-
-        print(final_response.message.content)
-    else:
-        print(response.message.content)
+@app.get("/", tags=["Application"])
+async def ping():
+    return {"message": "Rachel Agent API is running"}
