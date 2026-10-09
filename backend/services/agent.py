@@ -30,19 +30,26 @@ def run_agent(history: list[dict]) -> list[dict]:
     messages: list[OllamaMessage] = []
 
     for msg in history:
-        if msg["role"] == "tool":
+        role = msg["role"]
+        content = msg["content"]
+        tool_name = msg.get("tool_name")
+
+        if role == "assistant" and not content.strip():
+            continue
+
+        if role == "tool":
             messages.append(
                 OllamaMessage(
                     role="tool",
-                    content=msg["content"],
-                    tool_name=msg.get("tool_name"),
+                    content=content,
+                    tool_name=tool_name,
                 )
             )
         else:
             messages.append(
                 OllamaMessage(
-                    role=msg["role"],
-                    content=msg["content"],
+                    role=role,
+                    content=content,
                 )
             )
 
@@ -57,13 +64,14 @@ def run_agent(history: list[dict]) -> list[dict]:
     assistant_msg = response.message
     messages.append(assistant_msg)
 
-    new_messages.append(
-        {
-            "role": "assistant",
-            "content": assistant_msg.content or "",
-            "tool_name": None,
-        }
-    )
+    if assistant_msg.content and assistant_msg.content.strip():
+        new_messages.append(
+            {
+                "role": "assistant",
+                "content": assistant_msg.content,
+                "tool_name": None,
+            }
+        )
 
     if assistant_msg.tool_calls:
         for tc in assistant_msg.tool_calls:
@@ -102,6 +110,7 @@ def run_agent(history: list[dict]) -> list[dict]:
             messages=messages,
             tools=TOOLS,
         )
+
         final_msg = final_response.message
 
         new_messages.append(
