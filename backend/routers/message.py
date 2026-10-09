@@ -56,7 +56,7 @@ async def all_messages(
 # POST - Create message
 @router.post(
     "/{chat_id}",
-    response_model=MessageRead,
+    response_model=list[MessageRead],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_message(
