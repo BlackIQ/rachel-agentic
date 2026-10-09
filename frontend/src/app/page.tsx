@@ -1,3 +1,10 @@
+import { Typography, Button } from "@mui/material";
+
 export default function Home() {
-  return <h1>Rachel Agent Frontend</h1>;
+  return (
+    <>
+      <Typography>Rachel Agent Frontend</Typography>
+      <Button variant="outlined">Hello</Button>
+    </>
+  );
 }
