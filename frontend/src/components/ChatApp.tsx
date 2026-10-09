@@ -16,6 +16,7 @@ import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 import Sidebar from "@/components/Sidebar";
 import MessageBubble from "@/components/MessageBubble";
+import ToolGroup from "@/components/ToolGroup";
 import Composer from "@/components/Composer";
 import {
   createChat,
@@ -28,6 +29,36 @@ import {
 import type { Chat, Message } from "@/lib/types";
 
 const DRAWER_WIDTH = 300;
+
+type RenderBlock =
+  | { kind: "message"; message: Message }
+  | { kind: "tools"; tools: Message[]; key: string };
+
+function groupMessages(messages: Message[]): RenderBlock[] {
+  const blocks: RenderBlock[] = [];
+  let toolBuf: Message[] = [];
+
+  const flushTools = () => {
+    if (toolBuf.length === 0) return;
+    blocks.push({
+      kind: "tools",
+      tools: toolBuf,
+      key: toolBuf.map((t) => t.id).join("-"),
+    });
+    toolBuf = [];
+  };
+
+  for (const m of messages) {
+    if (m.role === "tool") {
+      toolBuf.push(m);
+    } else {
+      flushTools();
+      blocks.push({ kind: "message", message: m });
+    }
+  }
+  flushTools();
+  return blocks;
+}
 
 export default function ChatApp() {
   const theme = useTheme();
@@ -383,9 +414,13 @@ export default function ChatApp() {
                 gap: 1.75,
               }}
             >
-              {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
-              ))}
+              {groupMessages(messages).map((block) =>
+                block.kind === "tools" ? (
+                  <ToolGroup key={block.key} tools={block.tools} />
+                ) : (
+                  <MessageBubble key={block.message.id} message={block.message} />
+                ),
+              )}
 
               {sending && (
                 <Box

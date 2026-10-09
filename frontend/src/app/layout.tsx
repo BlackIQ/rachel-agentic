@@ -4,7 +4,7 @@ import ThemeRegistry from "@/components/ThemeRegistry";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Rachel — Personal AI Assistant",
+  title: "Rachel — Personal Assistant",
   description: "Rachel home agent interface",
 };
 
