@@ -20,7 +20,7 @@ class Message(BaseModel):
         index=True,
     )
     role: Mapped[RoleEnum] = mapped_column(
-        Enum(RoleEnum, name="role_enum", create_constraint=True),
+        Enum(RoleEnum, name="role_enum", create_constraint=True, native_enum=False),
         nullable=False,
     )
     content: Mapped[str] = mapped_column(
@@ -35,7 +35,7 @@ class Message(BaseModel):
     # Foreign Keys
     chat_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True),
-        ForeignKey("chats.id"),
+        ForeignKey("chats.id", ondelete="CASCADE"),
         index=True,
         nullable=False,
     )
