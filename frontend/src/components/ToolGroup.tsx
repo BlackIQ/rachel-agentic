@@ -1,9 +1,18 @@
 "use client";
 
+// React
 import { useState } from "react";
+
+// MUI
 import { Box, Collapse, Typography } from "@mui/material";
-import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
+
+// MUI Icons
+import {
+  CheckCircleOutlineRounded,
+  ExpandMoreRounded,
+} from "@mui/icons-material";
+
+// Lib
 import type { Message } from "@/lib/types";
 
 function formatToolContent(content: string): string {
@@ -26,6 +35,7 @@ function formatToolContent(content: string): string {
         return parts.join(" · ");
       }
     }
+
     return content;
   } catch {
     return content;
@@ -76,7 +86,7 @@ export default function ToolGroup({ tools }: Props) {
             },
           }}
         >
-          <CheckCircleOutlineRoundedIcon sx={{ fontSize: 15, opacity: 0.85 }} />
+          <CheckCircleOutlineRounded sx={{ fontSize: 15, opacity: 0.85 }} />
           <Typography
             component="span"
             sx={{
@@ -87,7 +97,7 @@ export default function ToolGroup({ tools }: Props) {
           >
             {summary}
           </Typography>
-          <ExpandMoreRoundedIcon
+          <ExpandMoreRounded
             sx={{
               fontSize: 16,
               opacity: 0.7,

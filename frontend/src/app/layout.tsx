@@ -5,7 +5,8 @@ import "@/styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Rachel — Personal Assistant",
-  description: "Rachel home agent interface",
+  description:
+    "Rachel is a personal assistant created by Amirhossein Mohammadi",
 };
 
 export default function RootLayout({

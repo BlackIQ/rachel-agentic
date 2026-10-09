@@ -1,6 +1,9 @@
 "use client";
 
+// React
 import { useCallback, useEffect, useRef, useState } from "react";
+
+// MUI
 import {
   Alert,
   Box,
@@ -11,13 +14,17 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
-import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
+// MUI Icons
+import { MenuRounded, SmartToyOutlined } from "@mui/icons-material";
+
+// Components
 import Sidebar from "@/components/Sidebar";
 import MessageBubble from "@/components/MessageBubble";
 import ToolGroup from "@/components/ToolGroup";
 import Composer from "@/components/Composer";
+
+// Libs
 import {
   createChat,
   deleteChat,
@@ -340,9 +347,9 @@ export default function ChatApp() {
                 height: 40,
               }}
             >
-              <MenuRoundedIcon />
+              <MenuRounded />
             </IconButton>
-            <Typography fontWeight={600} noWrap sx={{ flex: 1, pr: 1 }}>
+            <Typography noWrap sx={{ flex: 1, pr: 1, fontWeight: 600 }}>
               {activeTitle}
             </Typography>
           </Box>
@@ -395,12 +402,12 @@ export default function ChatApp() {
                   mb: 1,
                 }}
               >
-                <SmartToyOutlinedIcon sx={{ fontSize: 32 }} />
+                <SmartToyOutlined sx={{ fontSize: 32 }} />
               </Box>
-              <Typography variant="h5" fontWeight={700}>
+              <Typography variant="h5" sx={{ fontWeight: 700 }}>
                 Hi, I&apos;m Rachel
               </Typography>
-              <Typography color="text.secondary" maxWidth={360}>
+              <Typography color="text.secondary" sx={{ maxWidth: 360 }}>
                 Ask about home temperature, control LEDs, or check the weather.
               </Typography>
             </Box>
@@ -418,7 +425,10 @@ export default function ChatApp() {
                 block.kind === "tools" ? (
                   <ToolGroup key={block.key} tools={block.tools} />
                 ) : (
-                  <MessageBubble key={block.message.id} message={block.message} />
+                  <MessageBubble
+                    key={block.message.id}
+                    message={block.message}
+                  />
                 ),
               )}
 

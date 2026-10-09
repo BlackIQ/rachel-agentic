@@ -1,13 +1,15 @@
 "use client";
 
+// MUI
 import { Box, Paper, Typography } from "@mui/material";
+
+// Libs
 import type { Message } from "@/lib/types";
 
 export default function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
   const isAssistant = message.role === "assistant";
 
-  // tool messages are rendered via ToolGroup
   if (message.role === "tool") return null;
 
   return (

@@ -1,6 +1,9 @@
 "use client";
 
+// React
 import { useMemo } from "react";
+
+// MUI
 import {
   ThemeProvider,
   createTheme,

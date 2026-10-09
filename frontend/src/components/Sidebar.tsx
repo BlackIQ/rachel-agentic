@@ -1,6 +1,9 @@
 "use client";
 
+// React
 import { useState } from "react";
+
+// MUI
 import {
   Box,
   Button,
@@ -15,9 +18,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
-import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+
+// MUI Icons
+import {
+  AddRounded,
+  MoreHorizRounded,
+  SmartToyOutlined,
+} from "@mui/icons-material";
 
 type Chat = {
   id: string;
@@ -120,10 +127,10 @@ export default function Sidebar({
             flexShrink: 0,
           }}
         >
-          <SmartToyOutlinedIcon fontSize="small" />
+          <SmartToyOutlined fontSize="small" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography fontWeight={700} noWrap fontSize="0.95rem">
+          <Typography noWrap sx={{ fontWeight: 700, fontSize: "0.95rem" }}>
             Rachel
           </Typography>
           <Typography variant="caption" color="text.secondary" noWrap>
@@ -136,7 +143,7 @@ export default function Sidebar({
         <Button
           fullWidth
           variant="outlined"
-          startIcon={<AddRoundedIcon />}
+          startIcon={<AddRounded />}
           onClick={onNew}
         >
           New chat
@@ -190,10 +197,13 @@ export default function Sidebar({
               >
                 <Typography
                   noWrap
-                  fontWeight={active ? 600 : 500}
-                  fontSize="0.875rem"
                   color="text.primary"
-                  sx={{ flex: 1, minWidth: 0 }}
+                  sx={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontSize: "0.875rem",
+                    fontWeight: active ? 600 : 500,
+                  }}
                 >
                   {chat.title}
                 </Typography>
@@ -217,7 +227,7 @@ export default function Sidebar({
                     },
                   }}
                 >
-                  <MoreHorizRoundedIcon sx={{ fontSize: 16 }} />
+                  <MoreHorizRounded sx={{ fontSize: 16 }} />
                 </IconButton>
               </Box>
             );

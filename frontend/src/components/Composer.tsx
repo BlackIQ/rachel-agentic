@@ -1,5 +1,6 @@
 "use client";
 
+// MUI
 import {
   Box,
   CircularProgress,
@@ -7,7 +8,9 @@ import {
   InputBase,
   Paper,
 } from "@mui/material";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
+
+// MUI Icons
+import { SendRounded } from "@mui/icons-material";
 
 type Props = {
   value: string;
@@ -109,7 +112,7 @@ export default function Composer({
           {sending ? (
             <CircularProgress size={16} color="inherit" />
           ) : (
-            <SendRoundedIcon sx={{ fontSize: 18 }} />
+            <SendRounded sx={{ fontSize: 18 }} />
           )}
         </IconButton>
       </Paper>

@@ -1,4 +1,5 @@
 import { api } from "@/lib/api";
+
 import type {
   Chat,
   ChatWithMessages,
@@ -10,16 +11,19 @@ import type {
 
 export async function getChats(): Promise<Chat[]> {
   const { data } = await api.get<Chat[]>("/api/chats");
+
   return data;
 }
 
 export async function createChat(payload: CreateChatPayload): Promise<Chat> {
   const { data } = await api.post<Chat>("/api/chats", payload);
+
   return data;
 }
 
 export async function getChat(chatId: string): Promise<ChatWithMessages> {
   const { data } = await api.get<ChatWithMessages>(`/api/chats/${chatId}`);
+
   return data;
 }
 
@@ -28,6 +32,7 @@ export async function updateChat(
   payload: UpdateChatPayload,
 ): Promise<Chat> {
   const { data } = await api.patch<Chat>(`/api/chats/${chatId}`, payload);
+
   return data;
 }
 
@@ -37,6 +42,7 @@ export async function deleteChat(chatId: string): Promise<void> {
 
 export async function getMessages(chatId: string): Promise<Message[]> {
   const { data } = await api.get<Message[]>(`/api/messages/${chatId}`);
+
   return data;
 }
 
@@ -48,5 +54,6 @@ export async function sendMessage(
     `/api/messages/${chatId}`,
     payload,
   );
+
   return data;
 }
