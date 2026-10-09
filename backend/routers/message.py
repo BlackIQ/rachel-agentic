@@ -34,7 +34,7 @@ async def all_messages(
     db_messages = (
         db.query(Message)
         .where(Message.chat_id == db_chat.id)
-        .order_by(Message.created_at.desc())
+        .order_by(Message.created_at.asc())
         .all()
     )
 
@@ -45,7 +45,7 @@ async def all_messages(
 @router.post(
     "/{chat_id}", response_model=MessageRead, status_code=status.HTTP_201_CREATED
 )
-async def create_chats(
+async def create_message(
     chat_id: UUID,
     message_data: MessageCreate,
     db: Session = Depends(get_db),

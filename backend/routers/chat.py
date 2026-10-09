@@ -21,7 +21,16 @@ router = APIRouter(
 async def all_chats(
     db: Session = Depends(get_db),
 ):
-    db_chats = db.query(Chat).order_by(Chat.created_at.desc()).all()
+    db_chats = (
+        db.query(Chat)
+        .order_by(
+            Chat.created_at.asc(),
+        )
+        .where(
+            Chat.deleted_at.is_(None),
+        )
+        .all()
+    )
 
     return db_chats
 
@@ -47,7 +56,14 @@ async def get_chat(
     chat_id: UUID,
     db: Session = Depends(get_db),
 ):
-    db_chat = db.get(Chat, chat_id)
+    db_chat = (
+        db.query(Chat)
+        .where(
+            Chat.id == chat_id,
+            Chat.deleted_at.is_(None),
+        )
+        .one_or_none()
+    )
 
     if not db_chat:
         raise HTTPException(
@@ -65,7 +81,14 @@ async def update_chat(
     chat_data: ChatUpdate,
     db: Session = Depends(get_db),
 ):
-    db_chat = db.get(Chat, chat_id)
+    db_chat = (
+        db.query(Chat)
+        .where(
+            Chat.id == chat_id,
+            Chat.deleted_at.is_(None),
+        )
+        .one_or_none()
+    )
 
     if not db_chat:
         raise HTTPException(
@@ -88,7 +111,14 @@ async def delete_chat(
     chat_id: UUID,
     db: Session = Depends(get_db),
 ):
-    db_chat = db.get(Chat, chat_id)
+    db_chat = (
+        db.query(Chat)
+        .where(
+            Chat.id == chat_id,
+            Chat.deleted_at.is_(None),
+        )
+        .one_or_none()
+    )
 
     if not db_chat:
         raise HTTPException(
