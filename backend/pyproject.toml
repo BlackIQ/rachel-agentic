@@ -1,0 +1,14 @@
+[project]
+name = "rachel_backend"
+version = "0.1.0"
+description = "Rachel Agent (Assistant) Backend"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.142.4",
+    "ollama>=0.6.3",
+    "pydantic>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+]
