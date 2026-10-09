@@ -1,10 +1,5 @@
-import { Typography, Button } from "@mui/material";
+import ChatLayout from "@/components/ChatLayout";
 
 export default function Home() {
-  return (
-    <>
-      <Typography>Rachel Agent Frontend</Typography>
-      <Button variant="outlined">Hello</Button>
-    </>
-  );
+  return <ChatLayout />;
 }
