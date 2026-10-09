@@ -4,6 +4,7 @@ from datetime import datetime  # Datetime
 
 # Application
 from base.schema import BaseSchema  # Base: Schema
+from schemas.message import MessageRead  # Schemas: Message
 
 
 # Create Chat
@@ -22,3 +23,7 @@ class ChatRead(ChatCreate):
 
     created_at: datetime
     updated_at: datetime
+
+
+class ChatWithMessages(ChatRead):
+    messages: list[MessageRead] = []
