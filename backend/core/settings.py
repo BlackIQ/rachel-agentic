@@ -6,8 +6,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict  # Pydantic Setti
 class Settings(BaseSettings):
     # Model
     MODEL: str = "rachel-1.2:3b"
-    WEATHER_APIKEY: str = ""
+
+    # Database
+    POSTGRESQL_URL: str = ""
+
+    # Hardware (Raspberry Pi Pico 2 W)
     PICO_IP: str = ""
+
+    # Weather API
+    WEATHER_APIKEY: str = ""
 
     model_config = SettingsConfigDict(env_file=".env")
 
