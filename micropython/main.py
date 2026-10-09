@@ -1,7 +1,6 @@
 from machine import Pin, I2C
 import asyncio
 from picozero import pico_led
-from time import sleep
 import network
 import gc
 
@@ -10,6 +9,7 @@ from microdot import Microdot
 import dht
 
 from machine_i2c_lcd import I2cLcd
+import net_cerds
 
 i2c = I2C(sda=Pin(0), scl=Pin(1), freq=400000)
 
@@ -20,6 +20,11 @@ lcd.backlight_on()
 
 sensor_dht = dht.DHT11(Pin(15))
 
+dht_temperature = None
+dht_humidity = None
+
+ip = None
+
 LEDS = {
     "white": Pin(18, Pin.OUT),
     "green": Pin(19, Pin.OUT),
@@ -29,9 +34,11 @@ LEDS = {
 
 
 async def connect():
+    global ip
+
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect("", "")
+    wlan.connect(net_cerds.SSID, net_cerds.PASSWORD)
 
     lcd.clear()
 
@@ -40,10 +47,8 @@ async def connect():
     lcd.putstr("Connecting...")
 
     while not wlan.isconnected():
-        pico_led.on()
-        sleep(0.1)
-        pico_led.off()
-        sleep(0.1)
+        pico_led.toggle()
+        await asyncio.sleep(0.1)
 
     ip = wlan.ifconfig()[0]
 
@@ -54,8 +59,6 @@ async def connect():
     lcd.putstr("Rachel Agent!")
     lcd.move_to(0, 1)
     lcd.putstr(ip)
-
-    return ip
 
 
 app = Microdot()
@@ -68,11 +71,9 @@ def home(request):
 
 @app.get("/api/temperature")
 def home_sensor(request):
-    sensor_dht.measure()
-
     return {
-        "temperature": sensor_dht.temperature(),
-        "humidity": sensor_dht.humidity(),
+        "temperature": dht_temperature,
+        "humidity": dht_humidity,
     }
 
 
@@ -115,10 +116,11 @@ def not_found(request):
     return {"message": "Not found"}, 404
 
 
-async def display_loop(ip):
+async def display_loop():
     while True:
         lcd.clear()
 
+        lcd.move_to(0, 0)
         lcd.putstr("Rachel Agent!")
         lcd.move_to(0, 1)
         lcd.putstr("is ready.")
@@ -127,6 +129,7 @@ async def display_loop(ip):
 
         lcd.clear()
 
+        lcd.move_to(0, 0)
         lcd.putstr("Created by")
         lcd.move_to(0, 1)
         lcd.putstr("Dr. Amirhossein")
@@ -135,17 +138,43 @@ async def display_loop(ip):
 
         lcd.clear()
 
-        lcd.putstr("Serving on")
+        lcd.move_to(0, 0)
+        lcd.putstr("Network info:")
         lcd.move_to(0, 1)
         lcd.putstr(ip)
 
         await asyncio.sleep(5)
 
+        lcd.clear()
+
+        lcd.move_to(0, 0)
+        lcd.putstr(f"Free RAM: {gc.mem_free() // 1024} KB")
+        lcd.move_to(0, 1)
+        lcd.putstr(f"Used RAM: {gc.mem_alloc() // 1024} KB")
+
+        await asyncio.sleep(5)
+
+
+async def update_temp():
+    global dht_temperature, dht_humidity
+
+    while True:
+        try:
+            sensor_dht.measure()
+
+            dht_temperature = sensor_dht.temperature()
+            dht_humidity = sensor_dht.humidity()
+        except OSError:
+            pass
+
+        await asyncio.sleep(2)
+
 
 async def main():
-    ip = await connect()
+    await connect()
 
-    asyncio.create_task(display_loop(ip))
+    asyncio.create_task(display_loop())
+    asyncio.create_task(update_temp())
 
     await app.start_server(port=80)
 
