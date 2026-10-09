@@ -1,20 +1,15 @@
-# Libs
-from machine import Pin, I2C  # Machine
-from picozero import pico_led  # Pico Things
-from time import sleep  # Time
-import network  # Network
-import gc  # Monitoring
+from machine import Pin, I2C
+import asyncio
+from picozero import pico_led
+from time import sleep
+import network
+import gc
 
-# Microdot
-from microdot import Microdot  # Like Flask/FastAPI
+from microdot import Microdot
 
-# Sensors
-import dht  # HDT
+import dht
 
-# Customs
-from machine_i2c_lcd import I2cLcd  # Liquid Crystal
-
-# ===== LCD Setup ====
+from machine_i2c_lcd import I2cLcd
 
 i2c = I2C(sda=Pin(0), scl=Pin(1), freq=400000)
 
@@ -23,14 +18,7 @@ lcd = I2cLcd(i2c, 0x27, 2, 16)
 lcd.display_on()
 lcd.backlight_on()
 
-lcd.putstr("Rachel Agent!")
-lcd.move_to(0, 1)
-lcd.putstr("Booting...")
-
-# ===== DHT Setup =====
 sensor_dht = dht.DHT11(Pin(15))
-
-# ===== LED Setup =====
 
 LEDS = {
     "white": Pin(18, Pin.OUT),
@@ -39,16 +27,17 @@ LEDS = {
     "blue": Pin(21, Pin.OUT),
 }
 
-# ===== WLAN Setup ======
 
-SSID = ""
-PASSWORD = ""
-
-
-def connect():
+async def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect(SSID, PASSWORD)
+    wlan.connect("", "")
+
+    lcd.clear()
+
+    lcd.putstr("Rachel Agent!")
+    lcd.move_to(0, 1)
+    lcd.putstr("Connecting...")
 
     while not wlan.isconnected():
         pico_led.on()
@@ -66,8 +55,8 @@ def connect():
     lcd.move_to(0, 1)
     lcd.putstr(ip)
 
+    return ip
 
-# ===== API =====
 
 app = Microdot()
 
@@ -126,12 +115,39 @@ def not_found(request):
     return {"message": "Not found"}, 404
 
 
-lcd.clear()
+async def display_loop(ip):
+    while True:
+        lcd.clear()
 
-lcd.putstr("Rachel Agent!")
-lcd.move_to(0, 1)
-lcd.putstr("Connecting...")
+        lcd.putstr("Rachel Agent!")
+        lcd.move_to(0, 1)
+        lcd.putstr("is ready.")
 
-connect()
+        await asyncio.sleep(5)
 
-app.run(port=80)
+        lcd.clear()
+
+        lcd.putstr("Created by")
+        lcd.move_to(0, 1)
+        lcd.putstr("Dr. Amirhossein")
+
+        await asyncio.sleep(5)
+
+        lcd.clear()
+
+        lcd.putstr("Serving on")
+        lcd.move_to(0, 1)
+        lcd.putstr(ip)
+
+        await asyncio.sleep(5)
+
+
+async def main():
+    ip = await connect()
+
+    asyncio.create_task(display_loop(ip))
+
+    await app.start_server(port=80)
+
+
+asyncio.run(main())
