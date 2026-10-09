@@ -6,7 +6,12 @@ from uuid import UUID  # UUID
 
 # Application
 from dependencies.database import get_db  # Dependencies: Database
-from schemas.chat import ChatRead, ChatCreate, ChatUpdate  # Schemas: Chat
+from schemas.chat import (
+    ChatRead,
+    ChatCreate,
+    ChatUpdate,
+    ChatWithMessages,
+)  # Schemas: Chat
 from models.chat import Chat  # Models: Chat
 
 # Router
@@ -60,7 +65,7 @@ async def create_chats(
 # GET - Get chat
 @router.get(
     "/{chat_id}",
-    response_model=ChatRead,
+    response_model=ChatWithMessages,
 )
 async def get_chat(
     chat_id: UUID,
