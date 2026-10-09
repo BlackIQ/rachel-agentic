@@ -6,13 +6,13 @@ from schemas.common import MessageSchema  # Schemas: Chat
 
 # Router
 router = APIRouter(
-    prefix="/",
+    prefix="",
     tags=["Application"],
 )
 
 
 # GET - Index
-@router.get("", response_model=MessageSchema)
+@router.get("/", response_model=MessageSchema)
 async def index():
     return MessageSchema(
         message="Rachel Agent API is running",
