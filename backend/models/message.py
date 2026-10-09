@@ -1,10 +1,11 @@
 # Libs
-from sqlalchemy import Uuid, ForeignKey  # SQLAlchemy
+from sqlalchemy import Uuid, String, Text, Enum, ForeignKey  # SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship  # SQLAlchemy ORM
 import uuid  # UUID
 
 # Application
 from base.model import BaseModel  # Base: Model
+from enums.role import RoleEnum  # Enums: Role
 
 
 # Message Model
@@ -18,9 +19,21 @@ class Message(BaseModel):
         default=uuid.uuid4,
         index=True,
     )
+    role: Mapped[RoleEnum] = mapped_column(
+        Enum(RoleEnum, name="role_enum", create_constraint=True),
+        nullable=False,
+    )
+    content: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    tool_name: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
 
     # Foreign Keys
-    counter_id: Mapped[uuid.UUID] = mapped_column(
+    chat_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True),
         ForeignKey("chats.id"),
         index=True,
