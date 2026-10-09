@@ -18,12 +18,22 @@ router = APIRouter(
 
 
 # GET - All messages
-@router.get("/{chat_id}", response_model=list[MessageRead])
+@router.get(
+    "/{chat_id}",
+    response_model=list[MessageRead],
+)
 async def all_messages(
     chat_id: UUID,
     db: Session = Depends(get_db),
 ):
-    db_chat = db.get(Chat, chat_id)
+    db_chat = (
+        db.query(Chat)
+        .where(
+            Chat.id == chat_id,
+            Chat.deleted_at.is_(None),
+        )
+        .one_or_none()
+    )
 
     if not db_chat:
         raise HTTPException(
@@ -43,14 +53,23 @@ async def all_messages(
 
 # POST - Create message
 @router.post(
-    "/{chat_id}", response_model=MessageRead, status_code=status.HTTP_201_CREATED
+    "/{chat_id}",
+    response_model=MessageRead,
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_message(
     chat_id: UUID,
     message_data: MessageCreate,
     db: Session = Depends(get_db),
 ):
-    db_chat = db.get(Chat, chat_id)
+    db_chat = (
+        db.query(Chat)
+        .where(
+            Chat.id == chat_id,
+            Chat.deleted_at.is_(None),
+        )
+        .one_or_none()
+    )
 
     if not db_chat:
         raise HTTPException(
