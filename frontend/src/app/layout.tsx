@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 import ThemeRegistry from "@/components/ThemeRegistry";
-import "./globals.css";
+import "@/styles/globals.css";
 
 export const metadata: Metadata = {
-  title: "Rachel — A Personal AI Assistant",
-  description: "Rachel personal AI assistant",
+  title: "Rachel — Personal AI Assistant",
+  description: "Rachel home agent interface",
 };
 
 export default function RootLayout({
@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body>
         <AppRouterCacheProvider>
           <ThemeRegistry>{children}</ThemeRegistry>
