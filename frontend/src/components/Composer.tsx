@@ -44,17 +44,14 @@ export default function Composer({
         sx={{
           display: "flex",
           alignItems: "flex-end",
-          gap: 1,
-          px: 1.25,
-          py: 0.75,
-          borderRadius: 3,
+          gap: 0.75,
+          px: 1,
+          py: 0.5,
+          borderRadius: 2.5,
           bgcolor: "background.paper",
           border: "1px solid",
           borderColor: "divider",
-          boxShadow: (t) =>
-            t.palette.mode === "dark"
-              ? "0 4px 24px rgba(0,0,0,0.25)"
-              : "0 4px 20px rgba(20,30,50,0.06)",
+          transition: "border-color 120ms ease",
           "&:focus-within": {
             borderColor: "primary.main",
           },
@@ -83,11 +80,10 @@ export default function Composer({
             "aria-label": "Message Rachel",
           }}
           sx={{
-            px: 1,
-            py: 1,
+            px: 1.25,
+            py: 1.1,
             fontSize: "0.95rem",
             lineHeight: 1.55,
-            alignItems: "flex-end",
           }}
         />
 
@@ -99,7 +95,8 @@ export default function Composer({
             width: 40,
             height: 40,
             flexShrink: 0,
-            mb: 0.25,
+            mb: 0.35,
+            borderRadius: 2,
             bgcolor: "primary.main",
             color: "primary.contrastText",
             "&:hover": { bgcolor: "primary.dark" },

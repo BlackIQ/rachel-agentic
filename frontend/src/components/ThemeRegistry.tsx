@@ -8,6 +8,11 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
+/**
+ * Rachel palette — deep forest green
+ * Dark: near-black green surfaces, soft mint primary
+ * Light: warm off-white, deep teal-green primary
+ */
 export default function ThemeRegistry({
   children,
 }: {
@@ -24,34 +29,43 @@ export default function ThemeRegistry({
         palette: {
           mode: prefersDark ? "dark" : "light",
           primary: {
-            main: prefersDark ? "#7c9cff" : "#3d5afe",
-            light: prefersDark ? "#a8bfff" : "#6b7fff",
-            dark: prefersDark ? "#5a7ae6" : "#2a3eb1",
-            contrastText: prefersDark ? "#0b0d12" : "#ffffff",
+            main: prefersDark ? "#6bcf9a" : "#1b7a4a",
+            light: prefersDark ? "#9ae4bc" : "#2d9a62",
+            dark: prefersDark ? "#3d9a6e" : "#0f5c36",
+            contrastText: prefersDark ? "#06140c" : "#ffffff",
           },
           secondary: {
-            main: prefersDark ? "#9b8cff" : "#7c4dff",
+            main: prefersDark ? "#8fd4b0" : "#2e6b4f",
           },
           background: {
-            default: prefersDark ? "#0c0e12" : "#f4f5f8",
-            paper: prefersDark ? "#14171e" : "#ffffff",
+            default: prefersDark ? "#0a100d" : "#f3f6f4",
+            paper: prefersDark ? "#121a16" : "#ffffff",
           },
           text: {
-            primary: prefersDark ? "#e8eaef" : "#151821",
-            secondary: prefersDark ? "#9aa3b5" : "#5c6578",
+            primary: prefersDark ? "#e6efe9" : "#122018",
+            secondary: prefersDark ? "#8fa399" : "#4d6358",
           },
           divider: prefersDark
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(20,30,50,0.10)",
-          success: { main: "#5dcea0" },
-          error: { main: "#f07178" },
+            ? "rgba(140, 180, 155, 0.12)"
+            : "rgba(20, 50, 35, 0.10)",
+          action: {
+            hover: prefersDark
+              ? "rgba(107, 207, 154, 0.08)"
+              : "rgba(27, 122, 74, 0.06)",
+            selected: prefersDark
+              ? "rgba(107, 207, 154, 0.14)"
+              : "rgba(27, 122, 74, 0.10)",
+          },
+          success: { main: "#6bcf9a" },
+          error: { main: "#e57373" },
         },
-        shape: { borderRadius: 14 },
+        shape: {
+          borderRadius: 12,
+        },
         typography: {
           fontFamily:
             'Inter, Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
-          h4: { fontWeight: 700, letterSpacing: "-0.02em" },
-          h6: { fontWeight: 600 },
+          h5: { fontWeight: 700, letterSpacing: "-0.02em" },
           body1: { lineHeight: 1.65 },
           body2: { lineHeight: 1.55 },
         },
@@ -61,13 +75,13 @@ export default function ThemeRegistry({
               root: {
                 textTransform: "none",
                 fontWeight: 600,
-                borderRadius: 12,
+                borderRadius: 10,
               },
             },
           },
           MuiIconButton: {
             styleOverrides: {
-              root: { borderRadius: 12 },
+              root: { borderRadius: 10 },
             },
           },
           MuiPaper: {
@@ -78,6 +92,13 @@ export default function ThemeRegistry({
           MuiDrawer: {
             styleOverrides: {
               paper: { backgroundImage: "none" },
+            },
+          },
+          MuiListItemButton: {
+            styleOverrides: {
+              root: {
+                borderRadius: 10,
+              },
             },
           },
         },

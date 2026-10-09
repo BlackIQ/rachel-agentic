@@ -74,7 +74,7 @@ export default function MessageBubble({ message }: { message: Message }) {
           maxWidth: { xs: "92%", sm: "75%" },
           px: 2,
           py: 1.35,
-          borderRadius: isUser ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+          borderRadius: 2.5,
           bgcolor: isUser ? "primary.main" : "background.paper",
           color: isUser ? "primary.contrastText" : "text.primary",
           border: isAssistant ? "1px solid" : "none",

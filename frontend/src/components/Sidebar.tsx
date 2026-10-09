@@ -10,15 +10,13 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  ListItemButton,
-  ListItemText,
   Menu,
   MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
+import MoreHorizRoundedIcon from "@mui/icons-material/MoreHorizRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 type Chat = {
@@ -68,6 +66,7 @@ export default function Sidebar({
 
   function openMenu(event: React.MouseEvent<HTMLElement>, chat: Chat) {
     event.stopPropagation();
+    event.preventDefault();
     setMenuAnchor(event.currentTarget);
     setMenuChat(chat);
   }
@@ -87,9 +86,7 @@ export default function Sidebar({
 
   function confirmRename() {
     const title = renameValue.trim();
-    if (renameId && title) {
-      onRename(renameId, title);
-    }
+    if (renameId && title) onRename(renameId, title);
     setRenameOpen(false);
     setRenameId(null);
     setRenameValue("");
@@ -113,6 +110,7 @@ export default function Sidebar({
         bgcolor: "background.paper",
       }}
     >
+      {/* Brand */}
       <Box
         sx={{
           display: "flex",
@@ -128,7 +126,7 @@ export default function Sidebar({
           sx={{
             width: 36,
             height: 36,
-            borderRadius: 2,
+            borderRadius: 2.5,
             display: "grid",
             placeItems: "center",
             bgcolor: "action.hover",
@@ -151,7 +149,6 @@ export default function Sidebar({
       <Box sx={{ p: 1.5 }}>
         <Button
           fullWidth
-          size="large"
           variant="outlined"
           startIcon={<AddRoundedIcon />}
           onClick={onNew}
@@ -163,9 +160,9 @@ export default function Sidebar({
       <Typography
         variant="caption"
         color="text.secondary"
-        sx={{ px: 2, pb: 0.75, fontWeight: 600, letterSpacing: "0.04em" }}
+        sx={{ px: 2, pb: 0.75, fontWeight: 600, letterSpacing: "0.06em" }}
       >
-        Conversations
+        CONVERSATIONS
       </Typography>
 
       <Box sx={{ flex: 1, overflowY: "auto", px: 1, pb: 1.5 }}>
@@ -187,56 +184,67 @@ export default function Sidebar({
             return (
               <Box
                 key={chat.id}
+                onClick={() => onSelect(chat.id)}
                 sx={{
+                  group: true,
                   display: "flex",
-                  alignItems: "stretch",
+                  alignItems: "center",
+                  gap: 0.25,
                   mb: 0.5,
-                  borderRadius: 1,
-                  overflow: "hidden",
+                  px: 1.25,
+                  py: 1,
+                  borderRadius: 2.5,
+                  cursor: "pointer",
                   bgcolor: active ? "action.selected" : "transparent",
-                  border: "1px solid",
-                  borderColor: active ? "primary.main" : "transparent",
+                  transition: "background-color 120ms ease",
                   "&:hover": {
                     bgcolor: active ? "action.selected" : "action.hover",
                   },
+                  // show menu affordance on row hover
+                  "&:hover .chat-menu-btn": {
+                    opacity: 1,
+                  },
                 }}
               >
-                <ListItemButton
-                  onClick={() => onSelect(chat.id)}
-                  sx={{
-                    flex: 1,
-                    py: 1.1,
-                    px: 1.5,
-                    borderRadius: 0,
-                    minWidth: 0,
-                  }}
-                >
-                  <ListItemText
-                    primary={chat.title}
-                    // secondary={formatTime(chat.updated_at)}
-                    primaryTypographyProps={{
-                      noWrap: true,
-                      fontWeight: active ? 600 : 500,
-                      fontSize: "0.9rem",
-                    }}
-                    secondaryTypographyProps={{
-                      noWrap: true,
-                      fontSize: "0.72rem",
-                    }}
-                  />
-                </ListItemButton>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    noWrap
+                    fontWeight={active ? 600 : 500}
+                    fontSize="0.9rem"
+                    color="text.primary"
+                  >
+                    {chat.title}
+                  </Typography>
+                  {/* <Typography
+                    noWrap
+                    variant="caption"
+                    color="text.secondary"
+                    display="block"
+                  >
+                    {formatTime(chat.updated_at)}
+                  </Typography> */}
+                </Box>
 
                 <IconButton
+                  className="chat-menu-btn"
                   size="small"
                   aria-label="Chat options"
                   onClick={(e) => openMenu(e, chat)}
                   sx={{
-                    alignSelf: "center",
-                    mr: 0.5,
+                    width: 28,
+                    height: 28,
+                    flexShrink: 0,
+                    opacity: active ? 0.7 : 0,
                     color: "text.secondary",
+                    borderRadius: 1.5,
+                    transition: "opacity 120ms ease, background-color 120ms ease",
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                      color: "text.primary",
+                    },
                   }}
                 >
-                  <MoreVertRoundedIcon sx={{ fontSize: 18 }} />
+                  <MoreHorizRoundedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Box>
             );
@@ -250,6 +258,11 @@ export default function Sidebar({
         onClose={closeMenu}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
+        slotProps={{
+          paper: {
+            sx: { minWidth: 140, borderRadius: 2 },
+          },
+        }}
       >
         <MenuItem onClick={startRename}>Rename</MenuItem>
         <MenuItem onClick={confirmDelete} sx={{ color: "error.main" }}>
@@ -262,6 +275,9 @@ export default function Sidebar({
         onClose={() => setRenameOpen(false)}
         fullWidth
         maxWidth="xs"
+        slotProps={{
+          paper: { sx: { borderRadius: 3 } },
+        }}
       >
         <DialogTitle>Rename chat</DialogTitle>
         <DialogContent>
@@ -280,7 +296,7 @@ export default function Sidebar({
             }}
           />
         </DialogContent>
-        <DialogActions>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setRenameOpen(false)}>Cancel</Button>
           <Button
             variant="contained"

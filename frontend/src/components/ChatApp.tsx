@@ -6,7 +6,7 @@ import {
   Box,
   CircularProgress,
   Drawer,
-  Fab,
+  IconButton,
   Typography,
   useMediaQuery,
   useTheme,
@@ -217,6 +217,9 @@ export default function ChatApp() {
     }
   }
 
+  const activeTitle =
+    chats.find((c) => c.id === activeChatId)?.title ?? "Rachel";
+
   const sidebar = (
     <Sidebar
       chats={chats}
@@ -239,7 +242,7 @@ export default function ChatApp() {
         bgcolor: "background.default",
       }}
     >
-      {/* Desktop: always-visible sidebar */}
+      {/* Desktop sidebar */}
       {isDesktop && (
         <Box
           sx={{
@@ -254,7 +257,7 @@ export default function ChatApp() {
         </Box>
       )}
 
-      {/* Mobile: temporary drawer */}
+      {/* Mobile drawer */}
       {!isDesktop && (
         <Drawer
           variant="temporary"
@@ -272,7 +275,7 @@ export default function ChatApp() {
         </Drawer>
       )}
 
-      {/* Chat area — no navbar */}
+      {/* Chat column */}
       <Box
         sx={{
           flex: 1,
@@ -280,14 +283,41 @@ export default function ChatApp() {
           display: "flex",
           flexDirection: "column",
           height: "100%",
-          position: "relative",
         }}
       >
+        {/* Mobile top bar only */}
+        {!isDesktop && (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              px: 1.5,
+              py: 1,
+              minHeight: 56,
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+            }}
+          >
+            <IconButton
+              edge="start"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open chats"
+            >
+              <MenuRoundedIcon />
+            </IconButton>
+            <Typography fontWeight={600} noWrap sx={{ flex: 1 }}>
+              {activeTitle}
+            </Typography>
+          </Box>
+        )}
+
         {error && (
           <Alert
             severity="error"
             onClose={() => setError(null)}
-            sx={{ mx: 2, mt: 2, borderRadius: 2 }}
+            sx={{ mx: 2, mt: 2, borderRadius: 2.5 }}
           >
             {error}
           </Alert>
@@ -297,7 +327,7 @@ export default function ChatApp() {
           sx={{
             flex: 1,
             overflowY: "auto",
-            px: { xs: 1, sm: 3 },
+            px: { xs: 1.5, sm: 3 },
             py: 3,
           }}
         >
@@ -382,24 +412,6 @@ export default function ChatApp() {
             onSend={() => void handleSend()}
           />
         </Box>
-
-        {/* Mobile only: floating open-sidebar control (not a navbar) */}
-        {!isDesktop && (
-          <Fab
-            size="small"
-            color="primary"
-            aria-label="Open chats"
-            onClick={() => setMobileOpen(true)}
-            sx={{
-              position: "absolute",
-              top: 12,
-              left: 12,
-              zIndex: 2,
-            }}
-          >
-            <MenuRoundedIcon />
-          </Fab>
-        )}
       </Box>
     </Box>
   );
