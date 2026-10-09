@@ -291,9 +291,9 @@ export default function ChatApp() {
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 1,
-              px: 1.5,
-              py: 1,
+              gap: 1.5,
+              px: 2,
+              py: 1.25,
               minHeight: 56,
               borderBottom: "1px solid",
               borderColor: "divider",
@@ -301,13 +301,17 @@ export default function ChatApp() {
             }}
           >
             <IconButton
-              edge="start"
               onClick={() => setMobileOpen(true)}
               aria-label="Open chats"
+              sx={{
+                ml: 0.25,
+                width: 40,
+                height: 40,
+              }}
             >
               <MenuRoundedIcon />
             </IconButton>
-            <Typography fontWeight={600} noWrap sx={{ flex: 1 }}>
+            <Typography fontWeight={600} noWrap sx={{ flex: 1, pr: 1 }}>
               {activeTitle}
             </Typography>
           </Box>

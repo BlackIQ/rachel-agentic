@@ -8,11 +8,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 
-/**
- * Rachel palette — deep forest green
- * Dark: near-black green surfaces, soft mint primary
- * Light: warm off-white, deep teal-green primary
- */
 export default function ThemeRegistry({
   children,
 }: {
@@ -60,7 +55,7 @@ export default function ThemeRegistry({
           error: { main: "#e57373" },
         },
         shape: {
-          borderRadius: 12,
+          borderRadius: 6,
         },
         typography: {
           fontFamily:
@@ -75,13 +70,13 @@ export default function ThemeRegistry({
               root: {
                 textTransform: "none",
                 fontWeight: 600,
-                borderRadius: 10,
+                borderRadius: 6,
               },
             },
           },
           MuiIconButton: {
             styleOverrides: {
-              root: { borderRadius: 10 },
+              root: { borderRadius: 6 },
             },
           },
           MuiPaper: {
@@ -92,13 +87,6 @@ export default function ThemeRegistry({
           MuiDrawer: {
             styleOverrides: {
               paper: { backgroundImage: "none" },
-            },
-          },
-          MuiListItemButton: {
-            styleOverrides: {
-              root: {
-                borderRadius: 10,
-              },
             },
           },
         },

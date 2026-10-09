@@ -46,8 +46,8 @@ export default function Composer({
           alignItems: "flex-end",
           gap: 0.75,
           px: 1,
-          py: 0.5,
-          borderRadius: 2.5,
+          py: 0.4,
+          borderRadius: 1.5,
           bgcolor: "background.paper",
           border: "1px solid",
           borderColor: "divider",
@@ -80,10 +80,10 @@ export default function Composer({
             "aria-label": "Message Rachel",
           }}
           sx={{
-            px: 1.25,
-            py: 1.1,
-            fontSize: "0.95rem",
-            lineHeight: 1.55,
+            px: 1.1,
+            py: 1,
+            fontSize: "0.925rem",
+            lineHeight: 1.5,
           }}
         />
 
@@ -92,11 +92,11 @@ export default function Composer({
           disabled={!value.trim() || busy}
           aria-label="Send"
           sx={{
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             flexShrink: 0,
-            mb: 0.35,
-            borderRadius: 2,
+            mb: 0.3,
+            borderRadius: 1.25,
             bgcolor: "primary.main",
             color: "primary.contrastText",
             "&:hover": { bgcolor: "primary.dark" },
@@ -107,9 +107,9 @@ export default function Composer({
           }}
         >
           {sending ? (
-            <CircularProgress size={18} color="inherit" />
+            <CircularProgress size={16} color="inherit" />
           ) : (
-            <SendRoundedIcon sx={{ fontSize: 20 }} />
+            <SendRoundedIcon sx={{ fontSize: 18 }} />
           )}
         </IconButton>
       </Paper>

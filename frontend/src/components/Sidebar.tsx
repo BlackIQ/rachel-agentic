@@ -35,19 +35,6 @@ type Props = {
   onRename: (id: string, title: string) => void;
 };
 
-function formatTime(iso: string) {
-  try {
-    return new Date(iso).toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-}
-
 export default function Sidebar({
   chats,
   activeChatId,
@@ -110,7 +97,6 @@ export default function Sidebar({
         bgcolor: "background.paper",
       }}
     >
-      {/* Brand */}
       <Box
         sx={{
           display: "flex",
@@ -124,9 +110,9 @@ export default function Sidebar({
       >
         <Box
           sx={{
-            width: 36,
-            height: 36,
-            borderRadius: 2.5,
+            width: 34,
+            height: 34,
+            borderRadius: 1.5,
             display: "grid",
             placeItems: "center",
             bgcolor: "action.hover",
@@ -137,7 +123,7 @@ export default function Sidebar({
           <SmartToyOutlinedIcon fontSize="small" />
         </Box>
         <Box sx={{ flex: 1, minWidth: 0 }}>
-          <Typography fontWeight={700} noWrap>
+          <Typography fontWeight={700} noWrap fontSize="0.95rem">
             Rachel
           </Typography>
           <Typography variant="caption" color="text.secondary" noWrap>
@@ -186,44 +172,31 @@ export default function Sidebar({
                 key={chat.id}
                 onClick={() => onSelect(chat.id)}
                 sx={{
-                  group: true,
                   display: "flex",
                   alignItems: "center",
-                  gap: 0.25,
-                  mb: 0.5,
+                  gap: 0.5,
+                  mb: 0.35,
                   px: 1.25,
-                  py: 1,
-                  borderRadius: 2.5,
+                  py: 1.05,
+                  borderRadius: 1.5,
                   cursor: "pointer",
                   bgcolor: active ? "action.selected" : "transparent",
                   transition: "background-color 120ms ease",
                   "&:hover": {
                     bgcolor: active ? "action.selected" : "action.hover",
                   },
-                  // show menu affordance on row hover
-                  "&:hover .chat-menu-btn": {
-                    opacity: 1,
-                  },
+                  "&:hover .chat-menu-btn": { opacity: 1 },
                 }}
               >
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography
-                    noWrap
-                    fontWeight={active ? 600 : 500}
-                    fontSize="0.9rem"
-                    color="text.primary"
-                  >
-                    {chat.title}
-                  </Typography>
-                  {/* <Typography
-                    noWrap
-                    variant="caption"
-                    color="text.secondary"
-                    display="block"
-                  >
-                    {formatTime(chat.updated_at)}
-                  </Typography> */}
-                </Box>
+                <Typography
+                  noWrap
+                  fontWeight={active ? 600 : 500}
+                  fontSize="0.875rem"
+                  color="text.primary"
+                  sx={{ flex: 1, minWidth: 0 }}
+                >
+                  {chat.title}
+                </Typography>
 
                 <IconButton
                   className="chat-menu-btn"
@@ -231,20 +204,20 @@ export default function Sidebar({
                   aria-label="Chat options"
                   onClick={(e) => openMenu(e, chat)}
                   sx={{
-                    width: 28,
-                    height: 28,
+                    width: 26,
+                    height: 26,
                     flexShrink: 0,
-                    opacity: active ? 0.7 : 0,
+                    opacity: active ? 0.65 : 0,
                     color: "text.secondary",
-                    borderRadius: 1.5,
-                    transition: "opacity 120ms ease, background-color 120ms ease",
+                    borderRadius: 1,
+                    transition: "opacity 120ms ease",
                     "&:hover": {
                       bgcolor: "action.hover",
                       color: "text.primary",
                     },
                   }}
                 >
-                  <MoreHorizRoundedIcon sx={{ fontSize: 18 }} />
+                  <MoreHorizRoundedIcon sx={{ fontSize: 16 }} />
                 </IconButton>
               </Box>
             );
@@ -259,13 +232,13 @@ export default function Sidebar({
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         slotProps={{
-          paper: {
-            sx: { minWidth: 140, borderRadius: 2 },
-          },
+          paper: { sx: { minWidth: 140, borderRadius: 1.5 } },
         }}
       >
-        <MenuItem onClick={startRename}>Rename</MenuItem>
-        <MenuItem onClick={confirmDelete} sx={{ color: "error.main" }}>
+        <MenuItem onClick={startRename} dense>
+          Rename
+        </MenuItem>
+        <MenuItem onClick={confirmDelete} dense sx={{ color: "error.main" }}>
           Delete
         </MenuItem>
       </Menu>
@@ -275,9 +248,7 @@ export default function Sidebar({
         onClose={() => setRenameOpen(false)}
         fullWidth
         maxWidth="xs"
-        slotProps={{
-          paper: { sx: { borderRadius: 3 } },
-        }}
+        slotProps={{ paper: { sx: { borderRadius: 2 } } }}
       >
         <DialogTitle>Rename chat</DialogTitle>
         <DialogContent>
