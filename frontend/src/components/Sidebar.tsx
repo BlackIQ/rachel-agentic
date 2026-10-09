@@ -1,17 +1,24 @@
 "use client";
 
+import { useState } from "react";
 import {
   Box,
   Button,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   IconButton,
   ListItemButton,
   ListItemText,
+  Menu,
+  MenuItem,
+  TextField,
   Typography,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import MoreVertRoundedIcon from "@mui/icons-material/MoreVertRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 type Chat = {
@@ -27,7 +34,7 @@ type Props = {
   onSelect: (id: string) => void;
   onNew: () => void;
   onDelete: (id: string) => void;
-  onClose?: () => void;
+  onRename: (id: string, title: string) => void;
 };
 
 function formatTime(iso: string) {
@@ -50,8 +57,51 @@ export default function Sidebar({
   onSelect,
   onNew,
   onDelete,
-  onClose,
+  onRename,
 }: Props) {
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [menuChat, setMenuChat] = useState<Chat | null>(null);
+
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
+  const [renameId, setRenameId] = useState<string | null>(null);
+
+  function openMenu(event: React.MouseEvent<HTMLElement>, chat: Chat) {
+    event.stopPropagation();
+    setMenuAnchor(event.currentTarget);
+    setMenuChat(chat);
+  }
+
+  function closeMenu() {
+    setMenuAnchor(null);
+    setMenuChat(null);
+  }
+
+  function startRename() {
+    if (!menuChat) return;
+    setRenameId(menuChat.id);
+    setRenameValue(menuChat.title);
+    setRenameOpen(true);
+    closeMenu();
+  }
+
+  function confirmRename() {
+    const title = renameValue.trim();
+    if (renameId && title) {
+      onRename(renameId, title);
+    }
+    setRenameOpen(false);
+    setRenameId(null);
+    setRenameValue("");
+  }
+
+  function confirmDelete() {
+    if (!menuChat) return;
+    const id = menuChat.id;
+    closeMenu();
+    onDelete(id);
+  }
+
   return (
     <Box
       sx={{
@@ -93,19 +143,15 @@ export default function Sidebar({
             Rachel
           </Typography>
           <Typography variant="caption" color="text.secondary" noWrap>
-            Home assistant
+            Personal Assistant
           </Typography>
         </Box>
-        {onClose && (
-          <IconButton size="small" onClick={onClose} aria-label="Close menu">
-            <CloseRoundedIcon fontSize="small" />
-          </IconButton>
-        )}
       </Box>
 
       <Box sx={{ p: 1.5 }}>
         <Button
           fullWidth
+          size="large"
           variant="outlined"
           startIcon={<AddRoundedIcon />}
           onClick={onNew}
@@ -119,7 +165,7 @@ export default function Sidebar({
         color="text.secondary"
         sx={{ px: 2, pb: 0.75, fontWeight: 600, letterSpacing: "0.04em" }}
       >
-        CONVERSATIONS
+        Conversations
       </Typography>
 
       <Box sx={{ flex: 1, overflowY: "auto", px: 1, pb: 1.5 }}>
@@ -145,7 +191,7 @@ export default function Sidebar({
                   display: "flex",
                   alignItems: "stretch",
                   mb: 0.5,
-                  borderRadius: 2,
+                  borderRadius: 1,
                   overflow: "hidden",
                   bgcolor: active ? "action.selected" : "transparent",
                   border: "1px solid",
@@ -153,7 +199,6 @@ export default function Sidebar({
                   "&:hover": {
                     bgcolor: active ? "action.selected" : "action.hover",
                   },
-                  "&:hover .delete-btn": { opacity: 1 },
                 }}
               >
                 <ListItemButton
@@ -168,7 +213,7 @@ export default function Sidebar({
                 >
                   <ListItemText
                     primary={chat.title}
-                    secondary={formatTime(chat.updated_at)}
+                    // secondary={formatTime(chat.updated_at)}
                     primaryTypographyProps={{
                       noWrap: true,
                       fontWeight: active ? 600 : 500,
@@ -182,32 +227,70 @@ export default function Sidebar({
                 </ListItemButton>
 
                 <IconButton
-                  className="delete-btn"
                   size="small"
-                  aria-label={`Delete ${chat.title}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(chat.id);
-                  }}
+                  aria-label="Chat options"
+                  onClick={(e) => openMenu(e, chat)}
                   sx={{
                     alignSelf: "center",
-                    mr: 0.75,
-                    opacity: { xs: 1, md: 0 },
+                    mr: 0.5,
                     color: "text.secondary",
-                    transition: "opacity 120ms ease, color 120ms ease",
-                    "&:hover": {
-                      color: "error.main",
-                      bgcolor: "rgba(240, 113, 120, 0.12)",
-                    },
                   }}
                 >
-                  <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
+                  <MoreVertRoundedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Box>
             );
           })
         )}
       </Box>
+
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={closeMenu}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <MenuItem onClick={startRename}>Rename</MenuItem>
+        <MenuItem onClick={confirmDelete} sx={{ color: "error.main" }}>
+          Delete
+        </MenuItem>
+      </Menu>
+
+      <Dialog
+        open={renameOpen}
+        onClose={() => setRenameOpen(false)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Rename chat</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            fullWidth
+            margin="dense"
+            label="Title"
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                confirmRename();
+              }
+            }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setRenameOpen(false)}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={confirmRename}
+            disabled={!renameValue.trim()}
+          >
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

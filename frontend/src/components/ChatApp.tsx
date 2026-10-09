@@ -6,7 +6,7 @@ import {
   Box,
   CircularProgress,
   Drawer,
-  IconButton,
+  Fab,
   Typography,
   useMediaQuery,
   useTheme,
@@ -23,6 +23,7 @@ import {
   getChat,
   getChats,
   sendMessage,
+  updateChat,
 } from "@/lib/chat";
 import type { Chat, Message } from "@/lib/types";
 
@@ -41,13 +42,9 @@ export default function ChatApp() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setDrawerOpen(isDesktop);
-  }, [isDesktop]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -101,12 +98,8 @@ export default function ChatApp() {
     scrollToBottom();
   }, [messages, sending, scrollToBottom]);
 
-  function closeDrawerIfMobile() {
-    if (!isDesktop) setDrawerOpen(false);
-  }
-
   async function selectChat(chatId: string) {
-    closeDrawerIfMobile();
+    setMobileOpen(false);
     if (chatId === activeChatId) return;
 
     setActiveChatId(chatId);
@@ -126,7 +119,7 @@ export default function ChatApp() {
 
   async function handleNewChat() {
     setError(null);
-    closeDrawerIfMobile();
+    setMobileOpen(false);
     try {
       const chat = await createChat({ title: "New chat" });
       await refreshChats();
@@ -161,6 +154,16 @@ export default function ChatApp() {
       }
     } catch {
       setError("Could not delete this conversation.");
+    }
+  }
+
+  async function handleRename(chatId: string, title: string) {
+    setError(null);
+    try {
+      await updateChat(chatId, { title });
+      await refreshChats();
+    } catch {
+      setError("Could not rename this conversation.");
     }
   }
 
@@ -222,7 +225,7 @@ export default function ChatApp() {
       onSelect={(id) => void selectChat(id)}
       onNew={() => void handleNewChat()}
       onDelete={(id) => void handleDelete(id)}
-      onClose={isDesktop ? undefined : () => setDrawerOpen(false)}
+      onRename={(id, title) => void handleRename(id, title)}
     />
   );
 
@@ -236,30 +239,27 @@ export default function ChatApp() {
         bgcolor: "background.default",
       }}
     >
-      {isDesktop ? (
-        <Drawer
-          variant="persistent"
-          open={drawerOpen}
+      {/* Desktop: always-visible sidebar */}
+      {isDesktop && (
+        <Box
           sx={{
-            width: drawerOpen ? DRAWER_WIDTH : 0,
+            width: DRAWER_WIDTH,
             flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: DRAWER_WIDTH,
-              boxSizing: "border-box",
-              borderRight: "1px solid",
-              borderColor: "divider",
-              position: "relative",
-              height: "100%",
-            },
+            borderRight: "1px solid",
+            borderColor: "divider",
+            height: "100%",
           }}
         >
           {sidebar}
-        </Drawer>
-      ) : (
+        </Box>
+      )}
+
+      {/* Mobile: temporary drawer */}
+      {!isDesktop && (
         <Drawer
           variant="temporary"
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
+          open={mobileOpen}
+          onClose={() => setMobileOpen(false)}
           ModalProps={{ keepMounted: true }}
           sx={{
             "& .MuiDrawer-paper": {
@@ -272,6 +272,7 @@ export default function ChatApp() {
         </Drawer>
       )}
 
+      {/* Chat area — no navbar */}
       <Box
         sx={{
           flex: 1,
@@ -279,29 +280,9 @@ export default function ChatApp() {
           display: "flex",
           flexDirection: "column",
           height: "100%",
+          position: "relative",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            px: 1.25,
-            py: 0.75,
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            bgcolor: "background.paper",
-            minHeight: 48,
-          }}
-        >
-          <IconButton
-            onClick={() => setDrawerOpen((v) => !v)}
-            aria-label={drawerOpen ? "Close sidebar" : "Open sidebar"}
-            size="small"
-          >
-            <MenuRoundedIcon />
-          </IconButton>
-        </Box>
-
         {error && (
           <Alert
             severity="error"
@@ -401,6 +382,24 @@ export default function ChatApp() {
             onSend={() => void handleSend()}
           />
         </Box>
+
+        {/* Mobile only: floating open-sidebar control (not a navbar) */}
+        {!isDesktop && (
+          <Fab
+            size="small"
+            color="primary"
+            aria-label="Open chats"
+            onClick={() => setMobileOpen(true)}
+            sx={{
+              position: "absolute",
+              top: 12,
+              left: 12,
+              zIndex: 2,
+            }}
+          >
+            <MenuRoundedIcon />
+          </Fab>
+        )}
       </Box>
     </Box>
   );
