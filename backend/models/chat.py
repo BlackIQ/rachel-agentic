@@ -1,5 +1,5 @@
 # Libs
-from sqlalchemy import Uuid  # SQLAlchemy
+from sqlalchemy import Uuid, String  # SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship  # SQLAlchemy ORM
 import uuid  # UUID
 
@@ -18,9 +18,16 @@ class Chat(BaseModel):
         default=uuid.uuid4,
         index=True,
     )
+    title: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False,
+        default="New Chat",
+    )
 
     # Relationships
     messages: Mapped[list["Message"]] = relationship(
         "Message",
         back_populates="chat",
+        cascade="all, delete-orphan",
+        order_by="Message.created_at",
     )
