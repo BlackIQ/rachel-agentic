@@ -1,5 +1,6 @@
 # Libs
 from uuid import UUID  # UUID
+from datetime import datetime  # Datetime
 
 # Application
 from base.schema import BaseSchema  # Base: Schema
@@ -19,3 +20,6 @@ class MessageRead(MessageCreate):
 
     role: RoleEnum
     tool_name: str | None = None
+
+    created_at: datetime
+    updated_at: datetime
