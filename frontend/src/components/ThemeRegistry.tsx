@@ -1,47 +1,52 @@
 "use client";
 
 import { useMemo } from "react";
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
+import {
+  ThemeProvider,
+  createTheme,
+  CssBaseline,
+  useMediaQuery,
+} from "@mui/material";
 
 export default function ThemeRegistry({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)", {
+    noSsr: true,
+  });
+
   const theme = useMemo(
     () =>
       createTheme({
         cssVariables: true,
         palette: {
-          mode: "dark",
+          mode: prefersDark ? "dark" : "light",
           primary: {
-            main: "#7c9cff",
-            light: "#a8bfff",
-            dark: "#5a7ae6",
-            contrastText: "#0b0d12",
+            main: prefersDark ? "#7c9cff" : "#3d5afe",
+            light: prefersDark ? "#a8bfff" : "#6b7fff",
+            dark: prefersDark ? "#5a7ae6" : "#2a3eb1",
+            contrastText: prefersDark ? "#0b0d12" : "#ffffff",
           },
           secondary: {
-            main: "#9b8cff",
+            main: prefersDark ? "#9b8cff" : "#7c4dff",
           },
           background: {
-            default: "#0c0e12",
-            paper: "#14171e",
+            default: prefersDark ? "#0c0e12" : "#f4f5f8",
+            paper: prefersDark ? "#14171e" : "#ffffff",
           },
           text: {
-            primary: "#e8eaef",
-            secondary: "#9aa3b5",
+            primary: prefersDark ? "#e8eaef" : "#151821",
+            secondary: prefersDark ? "#9aa3b5" : "#5c6578",
           },
-          divider: "rgba(255,255,255,0.08)",
-          success: {
-            main: "#5dcea0",
-          },
-          error: {
-            main: "#f07178",
-          },
+          divider: prefersDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(20,30,50,0.10)",
+          success: { main: "#5dcea0" },
+          error: { main: "#f07178" },
         },
-        shape: {
-          borderRadius: 14,
-        },
+        shape: { borderRadius: 14 },
         typography: {
           fontFamily:
             'Inter, Roboto, system-ui, -apple-system, "Segoe UI", Arial, sans-serif',
@@ -49,7 +54,6 @@ export default function ThemeRegistry({
           h6: { fontWeight: 600 },
           body1: { lineHeight: 1.65 },
           body2: { lineHeight: 1.55 },
-          caption: { letterSpacing: "0.02em" },
         },
         components: {
           MuiButton: {
@@ -63,21 +67,22 @@ export default function ThemeRegistry({
           },
           MuiIconButton: {
             styleOverrides: {
-              root: {
-                borderRadius: 12,
-              },
+              root: { borderRadius: 12 },
             },
           },
           MuiPaper: {
             styleOverrides: {
-              root: {
-                backgroundImage: "none",
-              },
+              root: { backgroundImage: "none" },
+            },
+          },
+          MuiDrawer: {
+            styleOverrides: {
+              paper: { backgroundImage: "none" },
             },
           },
         },
       }),
-    [],
+    [prefersDark],
   );
 
   return (

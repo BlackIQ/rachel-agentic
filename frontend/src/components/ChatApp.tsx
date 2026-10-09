@@ -1,7 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Alert, Box, CircularProgress, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  Drawer,
+  IconButton,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 
 import Sidebar from "@/components/Sidebar";
@@ -16,7 +26,12 @@ import {
 } from "@/lib/chat";
 import type { Chat, Message } from "@/lib/types";
 
+const DRAWER_WIDTH = 300;
+
 export default function ChatApp() {
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,8 +41,13 @@ export default function ChatApp() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setDrawerOpen(isDesktop);
+  }, [isDesktop]);
 
   const scrollToBottom = useCallback(() => {
     requestAnimationFrame(() => {
@@ -37,14 +57,11 @@ export default function ChatApp() {
 
   const refreshChats = useCallback(async () => {
     const data = await getChats();
-
     const sorted = [...data].sort(
       (a, b) =>
         new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
     );
-
     setChats(sorted);
-
     return sorted;
   }, []);
 
@@ -54,18 +71,13 @@ export default function ChatApp() {
     async function boot() {
       try {
         const sorted = await refreshChats();
-
         if (cancelled) return;
 
         if (sorted.length > 0) {
           setActiveChatId(sorted[0].id);
           setLoadingMessages(true);
-
           const chat = await getChat(sorted[0].id);
-
-          if (!cancelled) {
-            setMessages(chat.messages ?? []);
-          }
+          if (!cancelled) setMessages(chat.messages ?? []);
         }
       } catch {
         if (!cancelled) {
@@ -80,7 +92,6 @@ export default function ChatApp() {
     }
 
     void boot();
-
     return () => {
       cancelled = true;
     };
@@ -90,7 +101,12 @@ export default function ChatApp() {
     scrollToBottom();
   }, [messages, sending, scrollToBottom]);
 
+  function closeDrawerIfMobile() {
+    if (!isDesktop) setDrawerOpen(false);
+  }
+
   async function selectChat(chatId: string) {
+    closeDrawerIfMobile();
     if (chatId === activeChatId) return;
 
     setActiveChatId(chatId);
@@ -100,7 +116,6 @@ export default function ChatApp() {
 
     try {
       const chat = await getChat(chatId);
-
       setMessages(chat.messages ?? []);
     } catch {
       setError("Could not load this conversation.");
@@ -111,12 +126,10 @@ export default function ChatApp() {
 
   async function handleNewChat() {
     setError(null);
-
+    closeDrawerIfMobile();
     try {
       const chat = await createChat({ title: "New chat" });
-
       await refreshChats();
-
       setActiveChatId(chat.id);
       setMessages([]);
       setInput("");
@@ -127,15 +140,20 @@ export default function ChatApp() {
 
   async function handleDelete(chatId: string) {
     setError(null);
-
     try {
       await deleteChat(chatId);
-
       const remaining = await refreshChats();
 
       if (activeChatId === chatId) {
         if (remaining.length > 0) {
-          await selectChat(remaining[0].id);
+          setActiveChatId(remaining[0].id);
+          setLoadingMessages(true);
+          try {
+            const chat = await getChat(remaining[0].id);
+            setMessages(chat.messages ?? []);
+          } finally {
+            setLoadingMessages(false);
+          }
         } else {
           setActiveChatId(null);
           setMessages([]);
@@ -196,8 +214,17 @@ export default function ChatApp() {
     }
   }
 
-  const activeTitle =
-    chats.find((c) => c.id === activeChatId)?.title ?? "Rachel";
+  const sidebar = (
+    <Sidebar
+      chats={chats}
+      activeChatId={activeChatId}
+      loading={loadingChats}
+      onSelect={(id) => void selectChat(id)}
+      onNew={() => void handleNewChat()}
+      onDelete={(id) => void handleDelete(id)}
+      onClose={isDesktop ? undefined : () => setDrawerOpen(false)}
+    />
+  );
 
   return (
     <Box
@@ -209,14 +236,41 @@ export default function ChatApp() {
         bgcolor: "background.default",
       }}
     >
-      <Sidebar
-        chats={chats}
-        activeChatId={activeChatId}
-        loading={loadingChats}
-        onSelect={(id) => void selectChat(id)}
-        onNew={() => void handleNewChat()}
-        onDelete={(id) => void handleDelete(id)}
-      />
+      {isDesktop ? (
+        <Drawer
+          variant="persistent"
+          open={drawerOpen}
+          sx={{
+            width: drawerOpen ? DRAWER_WIDTH : 0,
+            flexShrink: 0,
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              boxSizing: "border-box",
+              borderRight: "1px solid",
+              borderColor: "divider",
+              position: "relative",
+              height: "100%",
+            },
+          }}
+        >
+          {sidebar}
+        </Drawer>
+      ) : (
+        <Drawer
+          variant="temporary"
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            "& .MuiDrawer-paper": {
+              width: DRAWER_WIDTH,
+              boxSizing: "border-box",
+            },
+          }}
+        >
+          {sidebar}
+        </Drawer>
+      )}
 
       <Box
         sx={{
@@ -231,35 +285,21 @@ export default function ChatApp() {
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: 1.5,
-            px: { xs: 2, sm: 3 },
-            py: 1.75,
+            px: 1.25,
+            py: 0.75,
             borderBottom: "1px solid",
             borderColor: "divider",
             bgcolor: "background.paper",
+            minHeight: 48,
           }}
         >
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              borderRadius: 2,
-              display: "grid",
-              placeItems: "center",
-              bgcolor: "rgba(124,156,255,0.12)",
-              color: "primary.main",
-            }}
+          <IconButton
+            onClick={() => setDrawerOpen((v) => !v)}
+            aria-label={drawerOpen ? "Close sidebar" : "Open sidebar"}
+            size="small"
           >
-            <SmartToyOutlinedIcon fontSize="small" />
-          </Box>
-          <Box sx={{ minWidth: 0 }}>
-            <Typography fontWeight={600} noWrap>
-              {activeTitle}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {sending ? "Rachel is working…" : "Online"}
-            </Typography>
-          </Box>
+            <MenuRoundedIcon />
+          </IconButton>
         </Box>
 
         {error && (
@@ -304,7 +344,7 @@ export default function ChatApp() {
                   borderRadius: 3,
                   display: "grid",
                   placeItems: "center",
-                  bgcolor: "rgba(124,156,255,0.12)",
+                  bgcolor: "action.hover",
                   color: "primary.main",
                   mb: 1,
                 }}

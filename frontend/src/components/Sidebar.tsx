@@ -5,11 +5,15 @@ import {
   Button,
   CircularProgress,
   IconButton,
+  ListItemButton,
+  ListItemText,
   Typography,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
+
 type Chat = {
   id: string;
   title: string;
@@ -23,6 +27,7 @@ type Props = {
   onSelect: (id: string) => void;
   onNew: () => void;
   onDelete: (id: string) => void;
+  onClose?: () => void;
 };
 
 function formatTime(iso: string) {
@@ -45,19 +50,17 @@ export default function Sidebar({
   onSelect,
   onNew,
   onDelete,
+  onClose,
 }: Props) {
   return (
     <Box
-      component="aside"
       sx={{
-        width: { xs: 72, md: 280 },
-        flexShrink: 0,
+        width: 300,
+        maxWidth: "100%",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
-        borderRight: "1px solid",
-        borderColor: "divider",
         bgcolor: "background.paper",
-        height: "100%",
       }}
     >
       <Box
@@ -65,8 +68,8 @@ export default function Sidebar({
           display: "flex",
           alignItems: "center",
           gap: 1.25,
-          px: { xs: 1, md: 2 },
-          py: 2,
+          px: 2,
+          py: 1.75,
           borderBottom: "1px solid",
           borderColor: "divider",
         }}
@@ -78,14 +81,14 @@ export default function Sidebar({
             borderRadius: 2,
             display: "grid",
             placeItems: "center",
-            bgcolor: "rgba(124,156,255,0.15)",
+            bgcolor: "action.hover",
             color: "primary.main",
             flexShrink: 0,
           }}
         >
           <SmartToyOutlinedIcon fontSize="small" />
         </Box>
-        <Box sx={{ display: { xs: "none", md: "block" }, minWidth: 0 }}>
+        <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography fontWeight={700} noWrap>
             Rachel
           </Typography>
@@ -93,37 +96,33 @@ export default function Sidebar({
             Home assistant
           </Typography>
         </Box>
+        {onClose && (
+          <IconButton size="small" onClick={onClose} aria-label="Close menu">
+            <CloseRoundedIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
 
-      <Box sx={{ p: { xs: 1, md: 1.5 } }}>
+      <Box sx={{ p: 1.5 }}>
         <Button
           fullWidth
           variant="outlined"
           startIcon={<AddRoundedIcon />}
           onClick={onNew}
-          sx={{
-            justifyContent: { xs: "center", md: "flex-start" },
-            minWidth: 0,
-            px: { xs: 1, md: 2 },
-            "& .MuiButton-startIcon": {
-              mr: { xs: 0, md: 1 },
-            },
-          }}
         >
-          <Box component="span" sx={{ display: { xs: "none", md: "inline" } }}>
-            New chat
-          </Box>
+          New chat
         </Button>
       </Box>
 
-      <Box
-        sx={{
-          flex: 1,
-          overflowY: "auto",
-          px: { xs: 0.75, md: 1.25 },
-          pb: 1.5,
-        }}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ px: 2, pb: 0.75, fontWeight: 600, letterSpacing: "0.04em" }}
       >
+        CONVERSATIONS
+      </Typography>
+
+      <Box sx={{ flex: 1, overflowY: "auto", px: 1, pb: 1.5 }}>
         {loading ? (
           <Box sx={{ display: "grid", placeItems: "center", py: 4 }}>
             <CircularProgress size={22} />
@@ -132,7 +131,7 @@ export default function Sidebar({
           <Typography
             variant="body2"
             color="text.secondary"
-            sx={{ display: { xs: "none", md: "block" }, px: 1, py: 2 }}
+            sx={{ px: 1.5, py: 2 }}
           >
             No chats yet
           </Typography>
@@ -144,77 +143,65 @@ export default function Sidebar({
                 key={chat.id}
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  gap: 0.25,
+                  alignItems: "stretch",
                   mb: 0.5,
                   borderRadius: 2,
-                  bgcolor: active ? "rgba(124,156,255,0.12)" : "transparent",
-                  border: active
-                    ? "1px solid rgba(124,156,255,0.25)"
-                    : "1px solid transparent",
+                  overflow: "hidden",
+                  bgcolor: active ? "action.selected" : "transparent",
+                  border: "1px solid",
+                  borderColor: active ? "primary.main" : "transparent",
+                  "&:hover": {
+                    bgcolor: active ? "action.selected" : "action.hover",
+                  },
                   "&:hover .delete-btn": { opacity: 1 },
                 }}
               >
-                <Button
-                  fullWidth
-                  color="inherit"
+                <ListItemButton
                   onClick={() => onSelect(chat.id)}
                   sx={{
-                    justifyContent: { xs: "center", md: "flex-start" },
-                    textAlign: "left",
-                    px: { xs: 1, md: 1.25 },
-                    py: 1,
+                    flex: 1,
+                    py: 1.1,
+                    px: 1.5,
+                    borderRadius: 0,
                     minWidth: 0,
-                    borderRadius: 2,
                   }}
                 >
-                  <Box
-                    sx={{ display: { xs: "none", md: "block" }, minWidth: 0 }}
-                  >
-                    <Typography
-                      variant="body2"
-                      fontWeight={active ? 600 : 500}
-                      noWrap
-                    >
-                      {chat.title}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap>
-                      {formatTime(chat.updated_at)}
-                    </Typography>
-                  </Box>
-                  <Box
-                    sx={{
-                      display: { xs: "grid", md: "none" },
-                      placeItems: "center",
-                      width: 28,
-                      height: 28,
-                      borderRadius: 1.5,
-                      bgcolor: active
-                        ? "rgba(124,156,255,0.2)"
-                        : "action.hover",
-                      fontSize: 12,
-                      fontWeight: 700,
+                  <ListItemText
+                    primary={chat.title}
+                    secondary={formatTime(chat.updated_at)}
+                    primaryTypographyProps={{
+                      noWrap: true,
+                      fontWeight: active ? 600 : 500,
+                      fontSize: "0.9rem",
                     }}
-                  >
-                    {chat.title.slice(0, 1).toUpperCase()}
-                  </Box>
-                </Button>
+                    secondaryTypographyProps={{
+                      noWrap: true,
+                      fontSize: "0.72rem",
+                    }}
+                  />
+                </ListItemButton>
 
                 <IconButton
                   className="delete-btn"
                   size="small"
-                  aria-label="Delete chat"
-                  onClick={() => onDelete(chat.id)}
+                  aria-label={`Delete ${chat.title}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(chat.id);
+                  }}
                   sx={{
-                    display: { xs: "none", md: "inline-flex" },
-                    opacity: 0,
-                    mr: 0.5,
+                    alignSelf: "center",
+                    mr: 0.75,
+                    opacity: { xs: 1, md: 0 },
                     color: "text.secondary",
-                    transition: "opacity 150ms ease",
-                    "&:hover": { color: "error.main" },
+                    transition: "opacity 120ms ease, color 120ms ease",
+                    "&:hover": {
+                      color: "error.main",
+                      bgcolor: "rgba(240, 113, 120, 0.12)",
+                    },
                   }}
                 >
-                  <DeleteOutlineRoundedIcon fontSize="small" />
+                  <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
                 </IconButton>
               </Box>
             );

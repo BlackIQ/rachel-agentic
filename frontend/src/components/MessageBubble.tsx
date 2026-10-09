@@ -36,13 +36,7 @@ export default function MessageBubble({ message }: { message: Message }) {
 
   if (isTool) {
     return (
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-start",
-          px: { xs: 1, sm: 0 },
-        }}
-      >
+      <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
         <Chip
           size="small"
           label={`${message.tool_name ?? "tool"} · ${formatToolContent(message.content)}`}
@@ -52,9 +46,10 @@ export default function MessageBubble({ message }: { message: Message }) {
             py: 0.75,
             px: 0.5,
             borderRadius: 2,
-            bgcolor: "rgba(124, 156, 255, 0.12)",
-            color: "primary.light",
-            border: "1px solid rgba(124, 156, 255, 0.22)",
+            bgcolor: "action.hover",
+            color: "text.secondary",
+            border: "1px solid",
+            borderColor: "divider",
             "& .MuiChip-label": {
               whiteSpace: "normal",
               fontSize: "0.75rem",
@@ -71,7 +66,6 @@ export default function MessageBubble({ message }: { message: Message }) {
       sx={{
         display: "flex",
         justifyContent: isUser ? "flex-end" : "flex-start",
-        px: { xs: 1, sm: 0 },
       }}
     >
       <Paper
@@ -79,7 +73,7 @@ export default function MessageBubble({ message }: { message: Message }) {
         sx={{
           maxWidth: { xs: "92%", sm: "75%" },
           px: 2,
-          py: 1.4,
+          py: 1.35,
           borderRadius: isUser ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
           bgcolor: isUser ? "primary.main" : "background.paper",
           color: isUser ? "primary.contrastText" : "text.primary",

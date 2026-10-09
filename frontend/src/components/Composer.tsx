@@ -4,8 +4,8 @@ import {
   Box,
   CircularProgress,
   IconButton,
+  InputBase,
   Paper,
-  TextField,
 } from "@mui/material";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 
@@ -24,38 +24,49 @@ export default function Composer({
   onChange,
   onSend,
 }: Props) {
+  const busy = disabled || sending;
+
   return (
     <Box
       sx={{
         p: { xs: 1.5, sm: 2 },
-        pb: { xs: 2, sm: 2.5 },
-        borderTop: "1px solid",
-        borderColor: "divider",
+        pb: { xs: "max(12px, env(safe-area-inset-bottom))", sm: 2.5 },
         bgcolor: "background.default",
       }}
     >
       <Paper
         elevation={0}
+        component="form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSend();
+        }}
         sx={{
           display: "flex",
           alignItems: "flex-end",
           gap: 1,
-          px: 1.5,
-          py: 1,
+          px: 1.25,
+          py: 0.75,
           borderRadius: 3,
           bgcolor: "background.paper",
           border: "1px solid",
           borderColor: "divider",
+          boxShadow: (t) =>
+            t.palette.mode === "dark"
+              ? "0 4px 24px rgba(0,0,0,0.25)"
+              : "0 4px 20px rgba(20,30,50,0.06)",
+          "&:focus-within": {
+            borderColor: "primary.main",
+          },
         }}
       >
-        <TextField
+        <InputBase
           fullWidth
           multiline
           maxRows={5}
-          variant="standard"
           placeholder="Message Rachel…"
           value={value}
-          disabled={disabled || sending}
+          disabled={busy}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => {
             if (
@@ -67,25 +78,28 @@ export default function Composer({
               onSend();
             }
           }}
-          slotProps={{
-            htmlInput: { dir: "auto", "aria-label": "Message Rachel" },
-            input: { disableUnderline: true },
+          inputProps={{
+            dir: "auto",
+            "aria-label": "Message Rachel",
           }}
           sx={{
-            "& .MuiInputBase-root": {
-              fontSize: "0.95rem",
-              py: 0.75,
-            },
+            px: 1,
+            py: 1,
+            fontSize: "0.95rem",
+            lineHeight: 1.55,
+            alignItems: "flex-end",
           }}
         />
 
         <IconButton
-          onClick={onSend}
-          disabled={!value.trim() || sending || disabled}
+          type="submit"
+          disabled={!value.trim() || busy}
           aria-label="Send"
           sx={{
-            width: 42,
-            height: 42,
+            width: 40,
+            height: 40,
+            flexShrink: 0,
+            mb: 0.25,
             bgcolor: "primary.main",
             color: "primary.contrastText",
             "&:hover": { bgcolor: "primary.dark" },
@@ -96,9 +110,9 @@ export default function Composer({
           }}
         >
           {sending ? (
-            <CircularProgress size={20} color="inherit" />
+            <CircularProgress size={18} color="inherit" />
           ) : (
-            <SendRoundedIcon fontSize="small" />
+            <SendRoundedIcon sx={{ fontSize: 20 }} />
           )}
         </IconButton>
       </Paper>
