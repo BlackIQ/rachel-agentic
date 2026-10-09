@@ -32,7 +32,3 @@ export interface UpdateChatPayload {
 export interface CreateMessagePayload {
   content: string;
 }
-
-export interface MessageSchema {
-  message: string;
-}
