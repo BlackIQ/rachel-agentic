@@ -1,5 +1,5 @@
 # Libs
-from sqlalchemy import Uuid, String, Text, Enum, ForeignKey  # SQLAlchemy
+from sqlalchemy import Uuid, String, Text, ForeignKey  # SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column, relationship  # SQLAlchemy ORM
 import uuid  # UUID
 
@@ -20,7 +20,7 @@ class Message(BaseModel):
         index=True,
     )
     role: Mapped[RoleEnum] = mapped_column(
-        Enum(RoleEnum, name="role_enum", create_constraint=True, native_enum=False),
+        String(20),
         nullable=False,
     )
     content: Mapped[str] = mapped_column(
