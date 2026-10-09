@@ -1,6 +1,7 @@
 # Libs
 from fastapi import APIRouter, Depends, HTTPException, status  # FastAPI
 from sqlalchemy.orm import Session  # SQLAlchemy ORM
+from datetime import datetime, timezone  # Datetime
 from uuid import UUID  # UUID
 
 # Application
@@ -95,7 +96,9 @@ async def delete_chat(
             detail="Chat not found",
         )
 
-    db.delete(db_chat)
+    db_chat.deleted_at = datetime.now(timezone.utc)
+
     db.commit()
+    db.refresh(db_chat)
 
     return None
