@@ -34,11 +34,13 @@ A simple table to remember what is connected to what:
 | GPIO 1  | SCL I2C Bus       |
 | GPIO 6  | Relay: Library    |
 | GPIO 7  | Relay: Room       |
+| GPIO 8  | Relay: Hall       |
+| GPIO 9  | Relay: Kitchen    |
 | GPIO 16 | LED: White        |
 | GPIO 17 | LED: Green        |
 | GPIO 18 | LED: Red          |
 | GPIO 19 | LED: Blue         |
-| GPIO 26 | DHT11 Sensor Data |
+| GPIO 22 | DHT11 Sensor Data |
 
 ## Files
 
