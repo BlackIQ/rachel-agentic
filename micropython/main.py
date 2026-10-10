@@ -5,6 +5,7 @@ import network
 import gc
 
 from microdot import Microdot
+from microdot.auth import TokenAuth
 
 import dht
 
@@ -104,6 +105,15 @@ async def network_loop():
 
 
 app = Microdot()
+auth = TokenAuth()
+
+
+@auth.authenticate
+async def verify_token(request, token):
+    if token == config.TOKEN:
+        return "rachel"
+
+    return None
 
 
 @app.get("/")
@@ -112,6 +122,7 @@ def home(request):
 
 
 @app.get("/api/temperature")
+@auth
 def home_sensor(request):
     return {
         "temperature": dht_temperature,
@@ -120,6 +131,7 @@ def home_sensor(request):
 
 
 @app.post("/api/leds/<name>/on")
+@auth
 def led_on(request, name):
     led = LEDS.get(name)
 
@@ -132,6 +144,7 @@ def led_on(request, name):
 
 
 @app.post("/api/leds/<name>/off")
+@auth
 def led_off(request, name):
     led = LEDS.get(name)
 
@@ -144,6 +157,7 @@ def led_off(request, name):
 
 
 @app.get("/api/system/memory")
+@auth
 def memory(request):
     gc.collect()
 
@@ -156,6 +170,11 @@ def memory(request):
 @app.errorhandler(404)
 def not_found(request):
     return {"message": "Not found"}, 404
+
+
+@auth.errorhandler
+async def auth_error(request):
+    return {"message": "Unauthorized"}, 401
 
 
 async def display_loop():
