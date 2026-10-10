@@ -17,8 +17,13 @@ def get_pico_resources():
     """
 
     try:
+        headers = {
+            "Authorization": f"Bearer {settings.PICO_SECRET}",
+        }
+
         response = requests.get(
             f"{settings.PICO_IP}/api/system/memory",
+            headers=headers,
             timeout=5,
         )
 

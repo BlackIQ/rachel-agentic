@@ -39,8 +39,13 @@ def turn_led_on(name: str):
         }
 
     try:
+        headers = {
+            "Authorization": f"Bearer {settings.PICO_SECRET}",
+        }
+
         response = requests.post(
             f"{settings.PICO_IP}/api/leds/{name}/on",
+            headers=headers,
             timeout=5,
         )
 
@@ -97,8 +102,13 @@ def turn_led_off(name: str):
         }
 
     try:
+        headers = {
+            "Authorization": f"Bearer {settings.PICO_SECRET}",
+        }
+
         response = requests.post(
             f"{settings.PICO_IP}/api/leds/{name}/off",
+            headers=headers,
             timeout=5,
         )
 

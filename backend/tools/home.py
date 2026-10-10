@@ -17,8 +17,13 @@ def get_home_temperature():
     """
 
     try:
+        headers = {
+            "Authorization": f"Bearer {settings.PICO_SECRET}",
+        }
+
         response = requests.get(
             f"{settings.PICO_IP}/api/temperature",
+            headers=headers,
             timeout=5,
         )
 
