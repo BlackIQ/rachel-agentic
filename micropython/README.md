@@ -25,19 +25,20 @@ The FastAPI backend calls this device for temperature/humidity, LED control, and
 Let's take a look what is inside it:
 
 - `main.py`: App entry
-- `net_cerds.py`: Wi-Fi SSID & PASSWD
-- `microdot.py`: Bundled Microdot server
+- `config.py`: Configs. Wi-Fi SSID & PASSWD, Secret
 - `lcd_api.py`: LCD helpers
 - `machine_i2c_lcd.py`: I2C LCD Driver
+- `microdot`: Bundled Microdot server directory
 
 ## Setup
 
 1. Flash **MicroPython** for Pico 2 W.
-2. Edit `net_cerds.py`:
+2. Edit `config.py`:
 
 ```python
 SSID = "wifi-name"
 PASSWORD = "wifi-password"
+TOKEN = "Your token"
 ```
 
 3. Copy all files in this folder to the Pico with Thonny.
