@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict  # Pydantic Setti
 class Settings(BaseSettings):
     # Model
     # MODEL: str = "rachel-1.2:3b"
-    MODEL: str = "rachel-1.3:4b"
+    MODEL: str = "rachel-1.4:4b"
 
     # Database
     POSTGRESQL_URL: str = ""
