@@ -65,9 +65,9 @@ def get_weather(city: str) -> dict:
             data=data,
         ).to_agent()
 
-    except RequestException as e:
+    except RequestException:
         return ToolResult(
             success=False,
             error="network_error",
-            message=f"Could not reach WeatherAPI: {str(e)}",
+            message="Could not reach WeatherAPI. Check your internet connection.",
         ).to_agent()

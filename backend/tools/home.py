@@ -65,9 +65,9 @@ def get_home_temperature() -> dict:
             },
         ).to_agent()
 
-    except RequestException as e:
+    except RequestException:
         return ToolResult(
             success=False,
             error="pico_unreachable",
-            message=f"Could not reach the Pico device: {str(e)}",
+            message="Could not reach the Pico device. Check power and network.",
         ).to_agent()
