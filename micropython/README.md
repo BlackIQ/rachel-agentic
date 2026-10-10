@@ -69,13 +69,15 @@ TOKEN = "Your token"
 
 Base URL: `http://<pico-ip>/`
 
-| Method | Path                   | Description                           |
-| ------ | ---------------------- | ------------------------------------- |
-| GET    | `/`                    | Welcome JSON                          |
-| GET    | `/api/temperature`     | Get `temperature` and `humidity`      |
-| POST   | `/api/leds/<name>/on`  | Turn LED on. Pass `name` as LED name  |
-| POST   | `/api/leds/<name>/off` | Turn LED off. Pass `name` as LED name |
-| GET    | `/api/system/memory`   | Get `free` and `allocated`            |
+| Method | Path                     | Description                                |
+| ------ | ------------------------ | ------------------------------------------ |
+| GET    | `/`                      | Welcome JSON                               |
+| GET    | `/api/temperature`       | Get `temperature` and `humidity`           |
+| POST   | `/api/leds/<name>/on`    | Turn LED on. Pass `name` as LED name       |
+| POST   | `/api/leds/<name>/off`   | Turn LED off. Pass `name` as LED name      |
+| POST   | `/api/relays/<name>/on`  | Turn relay on. Pass `name` as relay name   |
+| POST   | `/api/relays/<name>/off` | Turn relay off. Pass `name` as relays name |
+| GET    | `/api/system/memory`     | Get `free` and `allocated`                 |
 
 ## Runtime
 
