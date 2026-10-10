@@ -24,6 +24,7 @@ dht_temperature = None
 dht_humidity = None
 
 ip = None
+network_connected = False
 
 LEDS = {
     "white": Pin(18, Pin.OUT),
@@ -33,8 +34,18 @@ LEDS = {
 }
 
 
+async def status_led_loop():
+    while True:
+        if network_connected:
+            pico_led.on()
+            await asyncio.sleep(0.2)
+        else:
+            pico_led.toggle()
+            await asyncio.sleep(0.5)
+
+
 async def network_loop():
-    global ip
+    global ip, network_connected
 
     wlan = network.WLAN(network.STA_IF)
     retry_delay = 1
@@ -50,7 +61,9 @@ async def network_loop():
                 if ip != current_ip:
                     ip = current_ip
 
+                network_connected = True
                 pico_led.on()
+
                 retry_delay = 1
 
                 await asyncio.sleep(3)
@@ -58,6 +71,8 @@ async def network_loop():
                 continue
 
             ip = None
+            network_connected = False
+
             pico_led.toggle()
 
             wlan.connect(config.SSID, config.PASSWORD)
@@ -83,6 +98,7 @@ async def network_loop():
 
         except OSError:
             ip = None
+            network_connected = False
 
         await asyncio.sleep(retry_delay)
 
@@ -200,6 +216,7 @@ async def update_temp():
 
 async def main():
     asyncio.create_task(network_loop())
+    asyncio.create_task(status_led_loop())
     asyncio.create_task(display_loop())
     asyncio.create_task(update_temp())
 
