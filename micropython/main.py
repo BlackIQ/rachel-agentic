@@ -13,13 +13,18 @@ import dht  # DHT11
 from lcd.machine_i2c_lcd import I2cLcd  # LCD
 from urtc.urtc import DS3231  # DS3231
 
+gc.collect()
+
 # Picozero
 from picozero.picozero import pico_led
+
+gc.collect()
 
 # Microdot
 from microdot.microdot import Microdot
 from microdot.auth import TokenAuth
 
+gc.collect()
 
 import config
 
