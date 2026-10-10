@@ -4,12 +4,14 @@ from picozero import pico_led
 import network
 import gc
 
+import dht
+
 from microdot import Microdot
 from microdot.auth import TokenAuth
 
-import dht
+from lcd.machine_i2c_lcd import I2cLcd
+from urtc.urtc import DS3231
 
-from machine_i2c_lcd import I2cLcd
 import config
 
 __version__ = "0.1.0"
@@ -17,6 +19,7 @@ __version__ = "0.1.0"
 i2c = I2C(sda=Pin(0), scl=Pin(1), freq=400000)
 
 lcd = I2cLcd(i2c, 0x27, 2, 16)
+rtc = DS3231(i2c)
 
 lcd.display_on()
 lcd.backlight_on()
