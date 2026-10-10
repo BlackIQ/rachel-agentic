@@ -45,4 +45,4 @@ Just:
 npm run dev
 ```
 
-Last thing, open [http://localhost:3000](http://localhost:3000).
+- UI: `http://127.0.0.1:3000`
