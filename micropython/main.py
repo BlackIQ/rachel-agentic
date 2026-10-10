@@ -1,16 +1,25 @@
+# Machine & Devices
 from machine import Pin, I2C
-import asyncio
-from picozero import pico_led
 import network
+
+# Libs
+import asyncio
 import gc
 
-import dht
+# Sensors
+import dht  # DHT11
 
-from microdot import Microdot
+# Modules
+from lcd.machine_i2c_lcd import I2cLcd  # LCD
+from urtc.urtc import DS3231  # DS3231
+
+# Picozero
+from picozero.picozero import pico_led
+
+# Microdot
+from microdot.microdot import Microdot
 from microdot.auth import TokenAuth
 
-from lcd.machine_i2c_lcd import I2cLcd
-from urtc.urtc import DS3231
 
 import config
 
