@@ -7,6 +7,7 @@ ToolErrorCode = Literal[
     "pico_unreachable",
     "pico_error",
     "unknown_led",
+    "unknown_relay",
     "invalid_response",
     "tool_not_found",
     "missing_api_key",
