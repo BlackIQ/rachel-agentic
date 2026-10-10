@@ -55,6 +55,7 @@ LEDS = {
 
 RELAYS = {
     "library": Pin(14, Pin.OUT),
+    "room": Pin(15, Pin.OUT),
 }
 
 
