@@ -38,7 +38,7 @@ rtc = DS3231(i2c)
 lcd.display_on()
 lcd.backlight_on()
 
-sensor_dht = dht.DHT11(Pin(26))
+sensor_dht = dht.DHT11(Pin(22))
 
 dht_temperature = None
 dht_humidity = None
@@ -56,7 +56,15 @@ LEDS = {
 RELAYS = {
     "library": Pin(6, Pin.OUT),
     "room": Pin(7, Pin.OUT),
+    "hall": Pin(8, Pin.OUT),
+    "kitchen": Pin(9, Pin.OUT),
 }
+
+for led in LEDS.values():
+    led.off()
+
+for relay in RELAYS.values():
+    relay.on()
 
 
 async def status_led_loop():
