@@ -13,20 +13,27 @@ The FastAPI backend calls this device for temperature/humidity, LED control, and
 
 ## Hardware parts
 
+Things I used for this project:
+
 | Part                        | Notes                                               |
 | --------------------------- | --------------------------------------------------- |
 | Raspberry Pi Pico 2 W       | Hardware having Wi-Fi thanks to Raspberry Pi        |
 | DS3231 RTC                  | Clock module                                        |
 | DHT11                       | Temperature and humidity sensor                     |
 | Liquid crystal 16×2 I2C LCD | Just to see some stuff in LCD like IP and RAM usage |
-| LEDs                        | White, green, red, blue                             |
+| LEDs                        | White, Green, Red, Blue                             |
+| Relays                      | Library, Room                                       |
 
 ## Pins
+
+A simple table to remember what is connected to what:
 
 | Pin     | Details           |
 | ------- | ----------------- |
 | GPIO 0  | SDA I2C Bus       |
 | GPIO 1  | SCL I2C Bus       |
+| GPIO 14 | Relay: Library    |
+| GPIO 15 | Relay: Room       |
 | GPIO 16 | LED: White        |
 | GPIO 17 | LED: Green        |
 | GPIO 18 | LED: Red          |
