@@ -32,8 +32,8 @@ A simple table to remember what is connected to what:
 | ------- | ----------------- |
 | GPIO 0  | SDA I2C Bus       |
 | GPIO 1  | SCL I2C Bus       |
-| GPIO 14 | Relay: Library    |
-| GPIO 15 | Relay: Room       |
+| GPIO 6  | Relay: Library    |
+| GPIO 7  | Relay: Room       |
 | GPIO 16 | LED: White        |
 | GPIO 17 | LED: Green        |
 | GPIO 18 | LED: Red          |
