@@ -74,7 +74,7 @@ def turn_led_on(name: str) -> dict:
 
         return ToolResult(
             success=True,
-            message=data.get("message", f"{name} is now on"),
+            message=data.get("message", f"LED {name} is now on"),
         ).to_agent()
 
     except RequestException:
@@ -145,7 +145,7 @@ def turn_led_off(name: str) -> dict:
 
         return ToolResult(
             success=True,
-            message=data.get("message", f"{name} is now off"),
+            message=data.get("message", f"LED {name} is now off"),
         ).to_agent()
 
     except RequestException:
