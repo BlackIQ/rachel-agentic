@@ -4,7 +4,7 @@ FastAPI service for **Rachel** includes chat storage, Ollama agent loop, and har
 
 ## Techs
 
-- **Python**: 💛
+- **Python**: Programming language
 - **FastAPI**: Backend framework
 - **SQLAlchemy**: ORM
 - **Alembic**: Migrations

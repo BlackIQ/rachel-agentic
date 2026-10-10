@@ -2,12 +2,14 @@
 
 NextJs user interface for the **Rachel** API.
 
-## Stack
+## Techs
 
-- **TypeScript**: 💙
+- **TypeScript**: Programming language
 - **NextJs**: Frontend framework
 - **React**: React
 - **MUI**: Design stuff
+- **NodeJs**: Runtime
+- **NPM**: Package manager
 
 ## Setup
 
