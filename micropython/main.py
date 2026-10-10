@@ -53,6 +53,10 @@ LEDS = {
     "blue": Pin(19, Pin.OUT),
 }
 
+RELAYS = {
+    "library": Pin(14, Pin.OUT),
+}
+
 
 async def status_led_loop():
     while True:
@@ -157,7 +161,7 @@ def led_on(request, name):
 
     led.on()
 
-    return {"message": f"{name} is now on"}
+    return {"message": f"LED {name} is now on"}
 
 
 @app.post("/api/leds/<name>/off")
@@ -170,7 +174,33 @@ def led_off(request, name):
 
     led.off()
 
-    return {"message": f"{name} is now off"}
+    return {"message": f"LED {name} is now off"}
+
+
+@app.post("/api/relays/<name>/on")
+@auth
+def relay_on(request, name):
+    relay = RELAYS.get(name)
+
+    if relay is None:
+        return {"message": "Unknown relay"}, 404
+
+    relay.on()
+
+    return {"message": f"Relay {name} is now on"}
+
+
+@app.post("/api/relays/<name>/off")
+@auth
+def relay_off(request, name):
+    relay = RELAYS.get(name)
+
+    if relay is None:
+        return {"message": "Unknown relay"}, 404
+
+    relay.off()
+
+    return {"message": f"Relay {name} is now off"}
 
 
 @app.get("/api/system/memory")
