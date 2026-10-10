@@ -11,6 +11,8 @@ import dht
 from machine_i2c_lcd import I2cLcd
 import config
 
+__version__ = "0.1.0"
+
 i2c = I2C(sda=Pin(0), scl=Pin(1), freq=400000)
 
 lcd = I2cLcd(i2c, 0x27, 2, 16)
@@ -38,10 +40,10 @@ async def status_led_loop():
     while True:
         if network_connected:
             pico_led.on()
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(2)
         else:
             pico_led.toggle()
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.4)
 
 
 async def network_loop():
@@ -50,55 +52,51 @@ async def network_loop():
     wlan = network.WLAN(network.STA_IF)
     retry_delay = 1
 
+    if not wlan.active():
+        wlan.active(True)
+
     while True:
+        if wlan.isconnected():
+            network_connected = True
+            ip = wlan.ifconfig()[0]
+
+            retry_delay = 1
+
+            await asyncio.sleep(5)
+            continue
+
+        network_connected = False
+        ip = None
+
         try:
             if not wlan.active():
                 wlan.active(True)
-
-            if wlan.isconnected():
-                current_ip = wlan.ifconfig()[0]
-
-                if ip != current_ip:
-                    ip = current_ip
-
-                network_connected = True
-                pico_led.on()
-
-                retry_delay = 1
-
-                await asyncio.sleep(3)
-
-                continue
-
-            ip = None
-            network_connected = False
-
-            pico_led.toggle()
-
-            wlan.connect(config.SSID, config.PASSWORD)
-
-            for _ in range(15):
-                if wlan.isconnected():
-                    break
-
-                await asyncio.sleep(1)
-
-            if wlan.isconnected():
-                ip = wlan.ifconfig()[0]
-
-                pico_led.on()
-                retry_delay = 1
-
-                continue
 
             try:
                 wlan.disconnect()
             except OSError:
                 pass
 
+            await asyncio.sleep(0.2)
+
+            wlan.connect(config.SSID, config.PASSWORD)
+
+            for _ in range(20):
+                if wlan.isconnected():
+                    break
+
+                await asyncio.sleep(0.5)
+
+            if wlan.isconnected():
+                network_connected = True
+                ip = wlan.ifconfig()[0]
+
+                retry_delay = 1
+
+                continue
+
         except OSError:
-            ip = None
-            network_connected = False
+            pass
 
         await asyncio.sleep(retry_delay)
 
@@ -167,7 +165,7 @@ async def display_loop():
         lcd.move_to(0, 0)
         lcd.putstr("Rachel Agent!")
         lcd.move_to(0, 1)
-        lcd.putstr("is ready.")
+        lcd.putstr(f"Version: {__version__}")
 
         await asyncio.sleep(5)
 
@@ -183,9 +181,18 @@ async def display_loop():
         lcd.clear()
 
         lcd.move_to(0, 0)
+        lcd.putstr("System info:")
+        lcd.move_to(0, 1)
+        lcd.putstr("Online" if network_connected else "Offline")
+
+        await asyncio.sleep(5)
+
+        lcd.clear()
+
+        lcd.move_to(0, 0)
         lcd.putstr("Network info:")
         lcd.move_to(0, 1)
-        lcd.putstr((ip or "Connecting...")[:16])
+        lcd.putstr((ip or "Connecting..."))
 
         await asyncio.sleep(5)
 
