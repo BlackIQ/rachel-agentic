@@ -6,6 +6,17 @@ She runs locally with **Ollama** (Qwen3, but customized), a **FastAPI backend**,
 
 > Bringing the old Rachel back — this time as a read agent.
 
+## A long story
+
+**Rachel** is not a new idea.
+
+The first public code goes back to **2020** ([Rachel](https://github.com/BlackIQ/Rachel)).
+Before that, work on the assistant had already started around **2019**.
+There was a separate core package ([RachelCore](https://github.com/BlackIQ/RachelCore)),
+and an archived early line ([OldRachel](https://github.com/BlackIQ/OldRachel)).
+
+Years later, this repo brings her back, local models, real hardware, and a full stack, but the name and the goal are the same: **A personal assistant that actually helps**.
+
 ## Screenshots
 
 | Chat & tools                        | Home empty state              | Persian conversation                    |
