@@ -6,15 +6,11 @@ She runs locally with **Ollama** (Qwen3, but customized), a **FastAPI backend**,
 
 > Bringing the old Rachel back — this time as a read agent.
 
----
-
 ## Screenshots
 
 | Chat & tools                        | Home empty state              | Persian conversation                    |
 | ----------------------------------- | ----------------------------- | --------------------------------------- |
 | ![Control](screenshots/control.png) | ![Home](screenshots/home.png) | ![Translate](screenshots/translate.png) |
-
----
 
 ## Architecture
 
