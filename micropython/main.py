@@ -21,7 +21,7 @@ lcd = I2cLcd(i2c, 0x27, 2, 16)
 lcd.display_on()
 lcd.backlight_on()
 
-sensor_dht = dht.DHT11(Pin(15))
+sensor_dht = dht.DHT11(Pin(26))
 
 dht_temperature = None
 dht_humidity = None
@@ -30,10 +30,10 @@ ip = None
 network_connected = False
 
 LEDS = {
-    "white": Pin(18, Pin.OUT),
-    "green": Pin(19, Pin.OUT),
-    "red": Pin(20, Pin.OUT),
-    "blue": Pin(21, Pin.OUT),
+    "white": Pin(16, Pin.OUT),
+    "green": Pin(17, Pin.OUT),
+    "red": Pin(18, Pin.OUT),
+    "blue": Pin(19, Pin.OUT),
 }
 
 
