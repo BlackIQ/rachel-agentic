@@ -8,6 +8,7 @@ from tools.weather import get_weather  # Tools: Weather
 from tools.home import get_home_temperature  # Tools: Home temp
 from tools.pico import get_pico_resources  # Tools: Pico resources
 from tools.led import turn_led_on, turn_led_off  # Tools: LED control
+from tools.relay import turn_relay_on, turn_relay_off  # Tools: Relay control
 
 TOOLS = [
     get_weather,
@@ -15,6 +16,8 @@ TOOLS = [
     get_pico_resources,
     turn_led_on,
     turn_led_off,
+    turn_relay_on,
+    turn_relay_off,
 ]
 
 AVAILABLE_FUNCTIONS = {
@@ -23,6 +26,8 @@ AVAILABLE_FUNCTIONS = {
     "get_pico_resources": get_pico_resources,
     "turn_led_on": turn_led_on,
     "turn_led_off": turn_led_off,
+    "turn_relay_on": turn_relay_on,
+    "turn_relay_off": turn_relay_off,
 }
 
 
