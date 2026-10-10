@@ -4,16 +4,22 @@ from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
+from tools.schema import ToolResult  # Tools: Schema
 
 
-def get_pico_resources():
-    """Get the current raspberry pi pico device resources information.
+def get_pico_resources() -> dict:
+    """Get Raspberry Pi Pico memory information.
 
     Returns:
-        A dictionary containing current raspberry pi pico device resources information.
-        The response includes:
-        - free: free memory
-        - allocated: allocated memory
+        ToolResult as dict. On success, data includes:
+            - free: free memory
+            - allocated: allocated memory
+
+        On failure, error may be:
+            - auth_failed
+            - pico_unreachable
+            - pico_error
+            - invalid_response
     """
 
     try:
@@ -27,23 +33,41 @@ def get_pico_resources():
             timeout=5,
         )
 
-        response.raise_for_status()
+        try:
+            data = response.json()
+        except ValueError:
+            return ToolResult(
+                success=False,
+                error="invalid_response",
+                message="Pico returned invalid JSON",
+            ).to_agent()
 
-        data = response.json()
+        if response.status_code == 401:
+            return ToolResult(
+                success=False,
+                error="auth_failed",
+                message="Authentication failed. Check PICO_SECRET and Pico TOKEN.",
+            ).to_agent()
 
-        return {
-            "success": True,
-            "data": data,
-        }
+        if not response.ok:
+            return ToolResult(
+                success=False,
+                error="pico_error",
+                message=data.get("message", "Pico error"),
+            ).to_agent()
+
+        return ToolResult(
+            success=True,
+            message="Pico memory reading",
+            data={
+                "free": data.get("free"),
+                "allocated": data.get("allocated"),
+            },
+        ).to_agent()
+
     except RequestException as e:
-        return {
-            "success": False,
-            "error": "pico_unreachable",
-            "message": f"Could not reach the Pico device: {str(e)}",
-        }
-    except ValueError:
-        return {
-            "success": False,
-            "error": "invalid_response",
-            "message": "Pico returned invalid JSON",
-        }
+        return ToolResult(
+            success=False,
+            error="pico_unreachable",
+            message=f"Could not reach the Pico device: {str(e)}",
+        ).to_agent()

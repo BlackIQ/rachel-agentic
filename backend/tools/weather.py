@@ -4,25 +4,31 @@ from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
+from tools.schema import ToolResult  # Tools: Schema
 
 
-def get_weather(city: str):
+def get_weather(city: str) -> dict:
     """Get the current weather information for a city.
 
     Args:
         city: The name of the city.
 
     Returns:
-        A dictionary containing current weather information,
-        or an error structure if the request fails.
+        ToolResult as dict. On success, data is the WeatherAPI payload.
+
+        On failure, error may be:
+            - missing_api_key
+            - weather_api_error
+            - network_error
+            - invalid_response
     """
 
     if not settings.WEATHER_APIKEY:
-        return {
-            "success": False,
-            "error": "missing_api_key",
-            "message": "Weather API key is not set in .env",
-        }
+        return ToolResult(
+            success=False,
+            error="missing_api_key",
+            message="Weather API key is not set in .env",
+        ).to_agent()
 
     try:
         response = requests.get(
@@ -34,30 +40,34 @@ def get_weather(city: str):
             timeout=8,
         )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            return ToolResult(
+                success=False,
+                error="invalid_response",
+                message="WeatherAPI returned invalid JSON",
+            ).to_agent()
 
-        if response.ok:
-            return {
-                "success": True,
-                "data": data,
-            }
+        if not response.ok:
+            error_msg = data.get("error", {}).get(
+                "message", "Unknown weather API error"
+            )
+            return ToolResult(
+                success=False,
+                error="weather_api_error",
+                message=error_msg,
+            ).to_agent()
 
-        error_msg = data.get("error", {}).get("message", "Unknown weather API error")
+        return ToolResult(
+            success=True,
+            message=f"Weather for {city}",
+            data=data,
+        ).to_agent()
 
-        return {
-            "success": False,
-            "error": "weather_api_error",
-            "message": error_msg,
-        }
     except RequestException as e:
-        return {
-            "success": False,
-            "error": "network_error",
-            "message": f"Could not reach WeatherAPI: {str(e)}",
-        }
-    except ValueError:
-        return {
-            "success": False,
-            "error": "invalid_response",
-            "message": "WeatherAPI returned invalid JSON",
-        }
+        return ToolResult(
+            success=False,
+            error="network_error",
+            message=f"Could not reach WeatherAPI: {str(e)}",
+        ).to_agent()

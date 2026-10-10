@@ -4,16 +4,22 @@ from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
+from tools.schema import ToolResult  # Tools: Schema
 
 
-def get_home_temperature():
+def get_home_temperature() -> dict:
     """Get the current home temperature information.
 
     Returns:
-        A dictionary containing current home temperature information.
-        The response includes:
-        - temperature: home temperature
-        - humidity: home humidity
+        ToolResult as dict. On success, data includes:
+            - temperature: home temperature
+            - humidity: home humidity
+
+        On failure, error may be:
+            - auth_failed: Pico rejected the token
+            - pico_unreachable: network / device offline
+            - pico_error: other HTTP error from Pico
+            - invalid_response: non-JSON body
     """
 
     try:
@@ -27,23 +33,41 @@ def get_home_temperature():
             timeout=5,
         )
 
-        response.raise_for_status()
+        try:
+            data = response.json()
+        except ValueError:
+            return ToolResult(
+                success=False,
+                error="invalid_response",
+                message="Pico returned invalid JSON",
+            ).to_agent()
 
-        data = response.json()
+        if response.status_code == 401:
+            return ToolResult(
+                success=False,
+                error="auth_failed",
+                message="Authentication failed. Check PICO_SECRET and Pico TOKEN.",
+            ).to_agent()
 
-        return {
-            "success": True,
-            "data": data,
-        }
+        if not response.ok:
+            return ToolResult(
+                success=False,
+                error="pico_error",
+                message=data.get("message", "Pico error"),
+            ).to_agent()
+
+        return ToolResult(
+            success=True,
+            message="Home sensor reading",
+            data={
+                "temperature": data.get("temperature"),
+                "humidity": data.get("humidity"),
+            },
+        ).to_agent()
+
     except RequestException as e:
-        return {
-            "success": False,
-            "error": "pico_unreachable",
-            "message": f"Could not reach the Pico device: {str(e)}",
-        }
-    except ValueError:
-        return {
-            "success": False,
-            "error": "invalid_response",
-            "message": "Pico returned invalid JSON",
-        }
+        return ToolResult(
+            success=False,
+            error="pico_unreachable",
+            message=f"Could not reach the Pico device: {str(e)}",
+        ).to_agent()

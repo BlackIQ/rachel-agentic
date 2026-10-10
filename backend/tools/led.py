@@ -4,6 +4,7 @@ from requests.exceptions import RequestException  # Requests Exception
 
 # Application
 from core.settings import settings  # Core: Settings
+from tools.schema import ToolResult  # Tools: Schema
 
 VALID_LEDS = {
     "white",
@@ -13,30 +14,29 @@ VALID_LEDS = {
 }
 
 
-def turn_led_on(name: str):
+def turn_led_on(name: str) -> dict:
     """Turn on a specific LED on the Rachel Pico device.
 
     Args:
-        name: The name of the LED to turn on.
-              Must be one of: "green", "red", "blue", "white".
+        name: LED name. One of: "green", "red", "blue", "white".
 
     Returns:
-        A dictionary with the result of the operation.
-        On success:
-            - success: True
-            - message: Confirmation message from the device
-        On failure:
-            - success: False
-            - error: Error code ("unknown_led" or "pico_error")
-            - message: Human-readable error message
+        ToolResult as dict.
+
+        On failure, error may be:
+            - unknown_led
+            - auth_failed
+            - pico_unreachable
+            - pico_error
+            - invalid_response
     """
 
     if name not in VALID_LEDS:
-        return {
-            "success": False,
-            "error": "unknown_led",
-            "message": f"Unknown LED: {name}",
-        }
+        return ToolResult(
+            success=False,
+            error="unknown_led",
+            message=f"Unknown LED: {name}",
+        ).to_agent()
 
     try:
         headers = {
@@ -49,57 +49,65 @@ def turn_led_on(name: str):
             timeout=5,
         )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            return ToolResult(
+                success=False,
+                error="invalid_response",
+                message="Pico returned invalid JSON",
+            ).to_agent()
 
-        if response.ok:
-            return {
-                "success": True,
-                "message": data.get("message", f"{name} is now on"),
-            }
+        if response.status_code == 401:
+            return ToolResult(
+                success=False,
+                error="auth_failed",
+                message="Authentication failed. Check PICO_SECRET and Pico TOKEN.",
+            ).to_agent()
 
-        return {
-            "success": False,
-            "error": "pico_error",
-            "message": data.get("message", "Unknown error from Pico"),
-        }
+        if not response.ok:
+            return ToolResult(
+                success=False,
+                error="pico_error",
+                message=data.get("message", "Pico error"),
+            ).to_agent()
+
+        return ToolResult(
+            success=True,
+            message=data.get("message", f"{name} is now on"),
+        ).to_agent()
+
     except RequestException as e:
-        return {
-            "success": False,
-            "error": "pico_unreachable",
-            "message": f"Could not reach the Pico device: {str(e)}",
-        }
-    except ValueError:
-        return {
-            "success": False,
-            "error": "invalid_response",
-            "message": "Pico returned invalid JSON",
-        }
+        return ToolResult(
+            success=False,
+            error="pico_unreachable",
+            message=f"Could not reach the Pico device: {str(e)}",
+        ).to_agent()
 
 
-def turn_led_off(name: str):
+def turn_led_off(name: str) -> dict:
     """Turn off a specific LED on the Rachel Pico device.
 
     Args:
-        name: The name of the LED to turn off.
-              Must be one of: "green", "red", "blue", "white".
+        name: LED name. One of: "green", "red", "blue", "white".
 
     Returns:
-        A dictionary with the result of the operation.
-        On success:
-            - success: True
-            - message: Confirmation message from the device
-        On failure:
-            - success: False
-            - error: Error code ("unknown_led" or "pico_error")
-            - message: Human-readable error message
+        ToolResult as dict.
+
+        On failure, error may be:
+            - unknown_led
+            - auth_failed
+            - pico_unreachable
+            - pico_error
+            - invalid_response
     """
 
     if name not in VALID_LEDS:
-        return {
-            "success": False,
-            "error": "unknown_led",
-            "message": f"Unknown LED: {name}",
-        }
+        return ToolResult(
+            success=False,
+            error="unknown_led",
+            message=f"Unknown LED: {name}",
+        ).to_agent()
 
     try:
         headers = {
@@ -112,28 +120,37 @@ def turn_led_off(name: str):
             timeout=5,
         )
 
-        data = response.json()
+        try:
+            data = response.json()
+        except ValueError:
+            return ToolResult(
+                success=False,
+                error="invalid_response",
+                message="Pico returned invalid JSON",
+            ).to_agent()
 
-        if response.ok:
-            return {
-                "success": True,
-                "message": data.get("message", f"{name} is now off"),
-            }
+        if response.status_code == 401:
+            return ToolResult(
+                success=False,
+                error="auth_failed",
+                message="Authentication failed. Check PICO_SECRET and Pico TOKEN.",
+            ).to_agent()
 
-        return {
-            "success": False,
-            "error": "pico_error",
-            "message": data.get("message", "Unknown error from Pico"),
-        }
+        if not response.ok:
+            return ToolResult(
+                success=False,
+                error="pico_error",
+                message=data.get("message", "Pico error"),
+            ).to_agent()
+
+        return ToolResult(
+            success=True,
+            message=data.get("message", f"{name} is now off"),
+        ).to_agent()
+
     except RequestException as e:
-        return {
-            "success": False,
-            "error": "pico_unreachable",
-            "message": f"Could not reach the Pico device: {str(e)}",
-        }
-    except ValueError:
-        return {
-            "success": False,
-            "error": "invalid_response",
-            "message": "Pico returned invalid JSON",
-        }
+        return ToolResult(
+            success=False,
+            error="pico_unreachable",
+            message=f"Could not reach the Pico device: {str(e)}",
+        ).to_agent()
